@@ -1,17 +1,4 @@
-#!/bin/bash -e
-
-# Sanity check
-if [ -z "$CX_INFRA_IT_CF_USERNAME" ]; then
-    echo "Failure: Variable CX_INFRA_IT_CF_USERNAME is unset"
-    exit 1
-fi
-
-if [ -z "$CX_INFRA_IT_CF_PASSWORD" ]; then
-    echo "Failure: Variable CX_INFRA_IT_CF_PASSWORD is unset"
-    exit 1
-fi
-
-set -x
+#!/bin/bash -ex
 
 # Start a local registry, to which we push the images built in this test, and from which they will be consumed in the test
 docker run -d -p 5000:5000 --restart always --name registry registry:2 || true
