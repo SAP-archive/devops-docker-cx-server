@@ -22,11 +22,11 @@ timeout(time: 5, unit: 'HOURS') {
         }
 
         stage('Trigger Job') {
-            jenkins.buildJob('infrastructure-integration-test')
+            jenkins.buildJob('infrastructure-integration-test-no-deployment')
         }
 
         stage('Wait for successful build') {
-            jenkins.waitForSuccess('infrastructure-integration-test', 'infrastructure-integration-test')
+            jenkins.waitForSuccess('infrastructure-integration-test-no-deployment', 'infrastructure-integration-test-no-deployment')
         }
     }
 }
