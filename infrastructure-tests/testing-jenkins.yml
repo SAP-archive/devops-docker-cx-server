@@ -6,7 +6,7 @@ jobs:
           branchSources {
               git {
                   remote("https://github.com/piper-validation/cloud-s4-sdk-book")
-                  includes('infrastructure-integration-test')
+                  includes('infrastructure-integration-test-no-deployment')
               }
           }
       }
