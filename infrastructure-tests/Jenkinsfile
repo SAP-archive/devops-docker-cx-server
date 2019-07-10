@@ -22,11 +22,11 @@ timeout(time: 5, unit: 'HOURS') {
         }
 
         stage('Trigger Job') {
-            jenkins.buildJob('infrastructure-integration-test-no-deployment')
+            jenkins.buildJob('validation-job')
         }
 
         stage('Wait for successful build') {
-            jenkins.waitForSuccess('infrastructure-integration-test-no-deployment', 'infrastructure-integration-test-no-deployment')
+            jenkins.waitForSuccess('validation-job', 'validate-cx-server')
         }
     }
 }
