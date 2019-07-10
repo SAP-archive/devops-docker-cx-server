@@ -2,11 +2,11 @@ jenkins:
   numExecutors: 10
 jobs:
   - script: >
-      multibranchPipelineJob('infrastructure-integration-test-no-deployment') {
+      multibranchPipelineJob('validation-job') {
           branchSources {
               git {
                   remote("https://github.com/piper-validation/cloud-s4-sdk-book")
-                  includes('infrastructure-integration-test-no-deployment')
+                  includes('validate-cx-server')
               }
           }
       }
