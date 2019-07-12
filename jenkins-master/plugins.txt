@@ -42,5 +42,5 @@ timestamper
 warnings-ng
 workflow-aggregator
 workflow-basic-steps
-workflow-cps
+workflow-cps:2.70
 workflow-multibranch
