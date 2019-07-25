@@ -1,22 +1,13 @@
-import com.cloudbees.groovy.cps.NonCPS
+@Library('piper-library-os') _
+
+import com.sap.piper.ConfigurationHelper
+import groovy.transform.Field
+
+@Field String STEP_NAME = 'testing'
 
 node("master") {
-    stage('Test Jenkinsfile Runner Image') {
-        sh 'echo Hello from Jenkins'
-        println("Plugin configuration:")
-        Jenkins.instance.pluginManager.plugins.each{
-            plugin -> println("${plugin.getShortName()}: ${plugin.getVersion()}")
-        }
-        iAmNonCPS()
+    stage('Reproduce issue') {
+        Map configuration = ConfigurationHelper.newInstance(this)
+            .use()
     }
-}
-
-// Regression test for https://issues.jenkins-ci.org/browse/JENKINS-58407
-@NonCPS
-def iAmNonCPS() {
-    iAmSerializable()
-}
-
-def iAmSerializable() {
-
 }
