@@ -154,12 +154,14 @@ Note: The command only works if you use the default image from Docker Hub.
 ./cx-server update image
 ```
 
+###### Performing a manual update
+
 In case you cannot use images from Docker Hub, the steps to do the same manually are:
 
 ```bash
 ./cx-server stop
 ./cx-server remove
-Manually update `docker_image` value in `server.cfg` to newest version
+Manually update `docker_image` value in `server.cfg` to newest version, or leave it as `latest`
 ./cx-server backup
 ./cx-server start
 ```
