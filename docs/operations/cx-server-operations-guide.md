@@ -132,9 +132,12 @@ The `cx-server` script can be updated via the `update script` command, if a new 
 ##### update image
 
 By default, the Cx Server image defined by `docker_image` in `server.cfg` always points to the latest version, which is rebuilt with each change in the GitHub repository.
+
 In productive environments, you will however likely want to fix the Cx Server image to a specific version.
 By defining `docker_image` with a version tag (e.g. `docker_image=ppiper/jenkins-master:v3`), you avoid unintended updates as a side-effect of restarting the Continuous Delivery server.
+
 However, this introduces the risk of getting stuck on an outdated version. Therefore, if you are using an outdated Cx Server version, the `cx-server` script will warn you and recommend to run the `cx-server update image` command.
+
 The `cx-server update image` command updates the Cx Server to the newest available version.
 If `v6` is the newest released version, running an update with `docker_image=ppiper/jenkins-master:v3` will update the configuration to `docker_image=ppiper/jenkins-master:v6`.
 
@@ -149,6 +152,18 @@ Note: The command only works if you use the default image from Docker Hub.
 
 ```bash
 ./cx-server update image
+```
+
+###### Performing a manual update
+
+In case you cannot use images from Docker Hub, the steps to do the same manually are:
+
+```bash
+./cx-server stop
+./cx-server remove
+Manually update `docker_image` value in `server.cfg` to newest version, or leave it as `latest`
+./cx-server backup
+./cx-server start
 ```
 
 #### Caching mechanism
