@@ -805,7 +805,7 @@ function update_image()
 {
     if [ -z ${DEVELOPER_MODE} ]; then docker pull "${cxserver_companion_docker_image}"; fi
     if [ ! -z ${docker_registry} ]; then
-        log_error "You are using a custom docker registry. Automated updating is only supported for Docker Hub. Please perform a manual update."
+        log_error "A custom Docker registry is configured. The `update image` command is only supported for Docker Hub. Please perform a manual update. Please refer to https://github.com/SAP/devops-docker-cx-server/blob/master/docs/operations/cx-server-operations-guide.md#performing-a-manual-update for more information."
         exit 1
     fi
 
