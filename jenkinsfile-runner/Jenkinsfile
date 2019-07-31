@@ -1,5 +1,3 @@
-import com.cloudbees.groovy.cps.NonCPS
-
 node("master") {
     stage('Test Jenkinsfile Runner Image') {
         sh 'echo Hello from Jenkins'
@@ -7,16 +5,5 @@ node("master") {
         Jenkins.instance.pluginManager.plugins.each{
             plugin -> println("${plugin.getShortName()}: ${plugin.getVersion()}")
         }
-        iAmNonCPS()
     }
-}
-
-// Regression test for https://issues.jenkins-ci.org/browse/JENKINS-58407
-@NonCPS
-def iAmNonCPS() {
-    iAmSerializable()
-}
-
-def iAmSerializable() {
-
 }
