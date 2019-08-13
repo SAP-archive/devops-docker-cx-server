@@ -3,6 +3,7 @@
 FROM ppiper/jenkins-master
 
 ENV JENKINSFILE_RUNNER_VERSION 1.0-beta-9
+ENV CASC_JENKINS_CONFIG=/github/workspace/jenkins.yml
 
 LABEL "com.github.actions.name"="Project Piper Jenkinsfile Runner"
 LABEL "com.github.actions.description"="Runs a Project Piper based Jenkinsfile in a short-lived Jenkins master"
