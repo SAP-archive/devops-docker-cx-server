@@ -29,4 +29,5 @@ ENTRYPOINT ["/jenkinsfile-runner/bin/jenkinsfile-runner", \
             "--jenkins-war", "/jenkins-war", \
             "--plugins", "/usr/share/jenkins/ref/plugins", \
             "--file", "/github/workspace", \
+            "--cache", "/github/workspace/.jenkinsfile-runner-cache", \
             "--no-sandbox"]
