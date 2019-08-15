@@ -20,6 +20,7 @@ The following images are published on [hub.docker.com](https://hub.docker.com/se
 |------|-------------|------|
 | Jenkins | Preconfigured Jenkins to run project "Piper" pipelines. | [ppiper/jenkins-master](https://hub.docker.com/r/ppiper/jenkins-master) |
 | Jenkinsfile Runner| [Jenkinsfile Runner](https://github.com/jenkinsci/jenkinsfile-runner) based on `ppiper/jenkins-master`, allows running a `Jenkinsfile` without a long-running, stateful Jenkins master. | [ppiper/jenkinsfile-runner](https://hub.docker.com/r/ppiper/jenkinsfile-runner) |
+| Jenkinsfile Runner GitHub Action | [GitHub Action](https://github.com/features/actions) for using the [Jenkinsfile runner](jenkinsfile-runner) | [jenkinsfile-runner-github-action](jenkinsfile-runner-github-action) |
 | Life Cycle Container| Sidecar image for life-cycle management of the cx-server|[ppiper/cx-server-companion](https://hub.docker.com/r/ppiper/cx-server-companion)|
 
 #### Versioning
