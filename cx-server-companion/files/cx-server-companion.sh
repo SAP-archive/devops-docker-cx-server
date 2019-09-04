@@ -271,6 +271,12 @@ function stop_jenkins_container()
         trace_execution "${exitCmd[@]}"
     fi
 
+    docker update --restart=no "${jenkins_container_name}"
+    if [ $? != 0 ];
+    then
+        log_warn "Setting restart behaviour to 'no' for jenkins container failed. Jenkins needs to be stopped forcefully (docker stop ${jenkins_container_name})"
+    fi
+
     echo -n "Waiting for Cx server to accept safeExit signal..."
     local attempts=120
     local i
@@ -310,7 +316,7 @@ function stop_nexus()
         log_info "The cache server is not running."
     else
         echo 'Stopping nexus'
-        run docker stop "${nexus_container_name}"
+        run docker rm --force "${nexus_container_name}"
         remove_networks
     fi
 }
@@ -318,7 +324,7 @@ function stop_nexus()
 function stop_nexus_unsafe()
 {
     echo 'Force-stopping nexus'
-    docker stop ${nexus_container_name}
+    docker rm --force "${nexus_container_name}"
     echo 'Remove networks'
     remove_networks
 }
@@ -409,6 +415,10 @@ function start_nexus_container()
             log_error "Failed to start existing nexus container."
             exit $?;
         fi
+        run docker update --restart unless-stopped "${nexus_container_name}"
+        if [ $? -ne "0" ]; then
+            log_warn "Failed to set restart behaviour for existing nexus container."
+        fi
     else
         run docker pull "${cache_docker_image}"
         if [ $? -ne "0" ]; then
@@ -435,7 +445,7 @@ function start_nexus_container()
             nexus_port_mapping+=(-p 8081:8081)
         fi
 
-        run docker run --name "${nexus_container_name}" --rm "${nexus_port_mapping[@]}" --network="${network_name}" -d "${environment_variable_parameters[@]}" "${cache_docker_image}"
+        run docker run --name "${nexus_container_name}" --restart unless-stopped "${nexus_port_mapping[@]}" --network="${network_name}" -d "${environment_variable_parameters[@]}" "${cache_docker_image}"
         if [ $? -ne "0" ]; then
             log_error "Failed to start new nexus container."
             exit $?;
@@ -490,6 +500,10 @@ function start_jenkins_container()
         if [ $? -ne "0" ]; then
             log_error "Failed to start existing cx-server container."
             exit $?;
+        fi
+        run docker update --restart unless-stopped "${jenkins_container_name}"
+        if [ $? -ne "0" ]; then
+            log_warn "Failed to set restart behaviour for existing cx-server container."
         fi
     else
         customDockerfileDir="custom_image"
@@ -609,7 +623,7 @@ function start_jenkins_container()
         # start container
 
         local start_jenkins=()
-        start_jenkins+=(docker run "${user_parameters[@]}" --name "${jenkins_container_name}" -d -p ${port_mapping})
+        start_jenkins+=(docker run --restart unless-stopped "${user_parameters[@]}" --name "${jenkins_container_name}" -d -p ${port_mapping})
         start_jenkins+=("${mount_parameters[@]}" "${environment_variable_parameters[@]}" "${image_name}")
         run "${start_jenkins[@]}"
 
