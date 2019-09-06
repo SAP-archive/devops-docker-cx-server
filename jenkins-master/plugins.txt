@@ -31,6 +31,7 @@ nexus-artifact-uploader
 parameterized-trigger
 performance
 pipeline-build-step
+pipeline-github
 pipeline-input-step
 pipeline-milestone-step
 pipeline-stage-step
