@@ -10,7 +10,7 @@ The `cx-server` and the `server.cfg` files will help to manage the complete life
 docker run -it --rm -u $(id -u):$(id -g) -v "${PWD}":/cx-server/mount/ ppiper/cx-server-companion:latest init-cx-server
 ```
 
-For the convenient usage of the script, a [completion script](https://raw.githubusercontent.com/SAP/devops-docker-images/master/cx-server-companion/cx-server/life-cycle-scrips/cx-server-completion.bash) for `cx-server` is provided. 
+For the convenient usage of the script, a [completion script](https://raw.githubusercontent.com/SAP/devops-docker-cx-server/master/cx-server-companion/life-cycle-scripts/cx-server-completion.bash) for `cx-server` is provided. 
 Source it in your shell, or refer to the documentation of your operating system for information on how to install this script system wide.
 
 #### System requirement
