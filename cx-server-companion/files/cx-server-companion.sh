@@ -274,7 +274,7 @@ function stop_jenkins_container()
     docker update --restart=no "${jenkins_container_name}"
     if [ $? != 0 ];
     then
-        log_warn "Setting restart behaviour to 'no' for jenkins container failed. Jenkins needs to be stopped forcefully (docker stop ${jenkins_container_name})"
+        log_warn "Setting restart behaviour to 'no' for jenkins container failed. Jenkins needs to be stopped forcefully (./cx-server stop --force})"
     fi
 
     echo -n "Waiting for Cx server to accept safeExit signal..."
