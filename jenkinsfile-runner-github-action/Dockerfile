@@ -1,6 +1,6 @@
 # Inhereting form 'latest' Jenkins master is ok since this image is controlled by us
 # hadolint ignore=DL3006
-FROM ppiper/jenkins-master
+FROM ppiper/jenkins-master:latest-plugins
 
 ENV JENKINSFILE_RUNNER_VERSION 1.0-beta-9
 ENV CASC_JENKINS_CONFIG=/github/workspace/jenkins.yml
