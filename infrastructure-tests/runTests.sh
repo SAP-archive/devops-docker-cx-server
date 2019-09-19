@@ -14,7 +14,7 @@ do
    echo $var >> custom-environment.list
 done
 chmod +x cx-server
-./cx-server start
+COMPANION_IMAGE_TAG=_RC ./cx-server start
 
 # Use Jenkinsfile runner to orchastrate the example project build.
 # See `Jenkinsfile` in this directory for details on what is happening.

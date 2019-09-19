@@ -5,5 +5,5 @@ script:
 - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 - chmod +x buildImages.sh && ./buildImages.sh
 - chmod +x pushImagesReleaseCandidate.sh && ./pushImagesReleaseCandidate.sh
-- cd infrastructure-tests && chmod +x runTests.sh && ./runTests.sh
+- cd infrastructure-tests && chmod +x runTests.sh && ./runTests.sh && cd ..
 - chmod +x pushImagesRelease.sh && ./pushImagesRelease.sh
