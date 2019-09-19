@@ -2,6 +2,7 @@
 
 # Copy over life cycle script for testing
 cp ../cx-server-companion/life-cycle-scripts/{cx-server,server.cfg} .
+echo 'docker_image="ppiper/jenkins-master:_RC"' >> server.cfg
 mkdir -p jenkins-configuration
 cp testing-jenkins.yml jenkins-configuration
 
@@ -19,10 +20,4 @@ chmod +x cx-server
 # See `Jenkinsfile` in this directory for details on what is happening.
 docker run -v //var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workspace \
  -e CASC_JENKINS_CONFIG=/workspace/jenkins.yml -e HOST=$(hostname) \
- ppiper/jenkinsfile-runner
-
-# cleanup
-if [ ! "$TRAVIS" = true ] ; then
-    rm -f cx-server server.cfg custom-environment.list
-    echo "Modified your git repo, you might want to do a git checkout before re-running."
-fi
+ ppiper/jenkinsfile-runner:_RC
