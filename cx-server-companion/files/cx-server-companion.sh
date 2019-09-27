@@ -947,8 +947,23 @@ function get_port_mapping(){
     return_value=$mapping
 }
 
+function migrate_s4sdk_to_ppiper_images()
+{
+    if [[ $docker_image == *"s4sdk/"* ]]; then
+        log_warn "You have configured a deprecated version of the jenkins-master image in the server.cfg."
+        read -n 1 -p "Do you want to update the configured docker_image in server.cfg to 'ppiper/jenkins-master'? (Y/N): " input
+        echo ""
+        if [[ "$input" == "y" ]] || [[ "$input" == "Y" ]]; then
+            sed -i "/docker_image/c\docker_image=\"ppiper/jenkins-master:latest\"" /cx-server/mount/server.cfg
+        else
+            echo "No changes will be made to server.cfg";
+        fi
+    fi
+}
+
 ### Start of Script
 read_configuration
+migrate_s4sdk_to_ppiper_images
 
 # ensure that docker is installed
 command -v docker > /dev/null 2>&1 || { echo >&2 "Docker does not seem to be installed. Please install docker and ensure that the docker command is included in \$PATH."; exit 1; }
