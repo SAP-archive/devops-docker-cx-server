@@ -949,7 +949,7 @@ function get_port_mapping(){
 
 function migrate_s4sdk_to_ppiper_images()
 {
-    if [[ $docker_image == *"s4sdk/"* ]]; then
+    if [[ $docker_image == *"s4sdk/jenkins-master:"* ]]; then
         log_warn "You have configured a deprecated version of the jenkins-master image in the server.cfg."
         read -n 1 -p "Do you want to update the configured docker_image in server.cfg to 'ppiper/jenkins-master'? (Y/N): " input
         echo ""
