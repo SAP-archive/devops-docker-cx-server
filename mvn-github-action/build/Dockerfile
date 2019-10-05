@@ -9,5 +9,5 @@ LABEL "repository"="https://github.com/sap/devops-docker-cx-server"
 LABEL "homepage"="https://github.com/sap/devops-docker-cx-server"
 LABEL "maintainer"="SAP SE"
 
-ENTRYPOINT ["mvn", "install", "--update-snapshots", "--batch-mode", \
+ENTRYPOINT ["mvn", "-Dmaven.repo.local=/github/workspace/maven_local_repo", "install", "--update-snapshots", "--batch-mode", \
             "--file", "/github/workspace/pom.xml", "-Dmaven.test.skip=true"]
