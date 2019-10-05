@@ -9,5 +9,5 @@ LABEL "repository"="https://github.com/sap/devops-docker-cx-server"
 LABEL "homepage"="https://github.com/sap/devops-docker-cx-server"
 LABEL "maintainer"="SAP SE"
 
-ENTRYPOINT ["package", \
+ENTRYPOINT ["mvn", "package", \
             "--file", "/github/workspace/pom.xml"]
