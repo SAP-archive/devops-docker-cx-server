@@ -1,0 +1,17 @@
+FROM maven:3-jdk-8
+
+LABEL "com.github.actions.name"="Project Piper Maven Builder"
+LABEL "com.github.actions.description"="Project Piper Maven Builder"
+LABEL "com.github.actions.icon"="play"
+LABEL "com.github.actions.color"="green"
+
+LABEL "repository"="https://github.com/sap/devops-docker-cx-server"
+LABEL "homepage"="https://github.com/sap/devops-docker-cx-server"
+LABEL "maintainer"="SAP SE"
+
+
+COPY entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+
+ENTRYPOINT ["mvn", "-Dmaven.repo.local=/github/workspace/maven_local_repo", "install", "--update-snapshots", "--batch-mode", \
+            "--file", "/github/workspace/pom.xml", "-Dmaven.test.skip=true"]
