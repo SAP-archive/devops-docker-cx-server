@@ -12,6 +12,3 @@ LABEL "maintainer"="SAP SE"
 
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
-
-ENTRYPOINT ["mvn", "-Dmaven.repo.local=/github/workspace/maven_local_repo", "install", "--update-snapshots", "--batch-mode", \
-            "--file", "/github/workspace/pom.xml", "-Dmaven.test.skip=true"]
