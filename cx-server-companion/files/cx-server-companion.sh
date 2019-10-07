@@ -967,7 +967,7 @@ function warn_and_offer_migration()
     echo ""
     if [[ "$input" == "y" ]] || [[ "$input" == "Y" ]]; then
         sed -i "/docker_image/c\docker_image=\"$1\"" /cx-server/mount/server.cfg
-        docker stop s4sd-jenkins-master
+        docker stop s4sdk-jenkins-master
         docker rm s4sdk-jenkins-master
         remove_networks
         backup_volume
