@@ -949,15 +949,32 @@ function get_port_mapping(){
 
 function migrate_s4sdk_to_ppiper_images()
 {
-    if [[ $docker_image == *"s4sdk/jenkins-master:"* ]]; then
-        log_warn "You have configured a deprecated version of the jenkins-master image in the server.cfg."
-        read -n 1 -p "Do you want to update the configured docker_image in server.cfg to 'ppiper/jenkins-master'? (Y/N): " input
-        echo ""
-        if [[ "$input" == "y" ]] || [[ "$input" == "Y" ]]; then
-            sed -i "/docker_image/c\docker_image=\"ppiper/jenkins-master:latest\"" /cx-server/mount/server.cfg
-        else
-            echo "No changes will be made to server.cfg";
-        fi
+    if [[ $docker_image =~ ^s4sdk/jenkins-master:v[0-9]+$ ]]; then
+        #TODO: update as soon as there is a new release
+        warn_and_offer_migration "ppiper/jenkins-master:v2"
+
+    elif [[ $docker_image =~ ^s4sdk/jenkins-master:latest$ ]]; then
+        warn_and_offer_migration "ppiper/jenkins-master:latest"
+    fi
+
+}
+
+function warn_and_offer_migration()
+{
+    log_warn "Since October 2019 the s4sdk/jenkins-master image ist deprecated. The docker images for the SAP Cloud SDK are now maintained in the repository https://github.com/SAP/devops-docker-cx-server."
+    log_warn "This migration will stop jenkins-master, change the docker_image in server.cf to $1, start the backup of your jenkins-home volume and finally starts jenkins-master again. Those tasks will result in a downtime depending of the size of you jenkins_home volume up to a few hours."
+    read -n 1 -p "Do you want to update the configured docker_image in server.cfg to '$1'? (Y/N): " input
+    echo ""
+    if [[ "$input" == "y" ]] || [[ "$input" == "Y" ]]; then
+        sed -i "/docker_image/c\docker_image=\"$1\"" /cx-server/mount/server.cfg
+        docker stop s4sd-jenkins-master
+        docker rm s4sdk-jenkins-master
+        remove_networks
+        backup_volume
+        read_configuration
+        start_jenkins
+    else
+        echo "No changes will be applied to server.cfg"
     fi
 }
 
