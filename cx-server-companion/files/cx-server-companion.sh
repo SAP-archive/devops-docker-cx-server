@@ -962,8 +962,8 @@ function migrate_s4sdk_to_ppiper_images()
 function warn_and_offer_migration()
 {
     log_warn "Since October 2019 the s4sdk/jenkins-master image is deprecated. The docker images for the SAP Cloud SDK are now maintained in the repository https://github.com/SAP/devops-docker-cx-server."
-    log_warn "This migration will stop jenkins-master, change the docker_image in server.cfg to $1, start the backup of your jenkins-home volume and finally starts jenkins-master again. Those tasks will result in a few minutes downtime."
-    read -n 1 -p "Do you want to update the configured docker_image in server.cfg to '$1'? (Y/N): " input
+    log_warn "This migration will start the backup of your jenkins-home volume, change the docker_image in server.cfg to $1, stop s4sdk/jenkins-master and finally start ppiper/jenkins-master. Those tasks will result in a few minutes of downtime."
+    read -n 1 -p "Do you want to proceed with the migration? (Y/N): " input
     echo ""
     if [[ "$input" == "y" ]] || [[ "$input" == "Y" ]]; then
         backup_volume
