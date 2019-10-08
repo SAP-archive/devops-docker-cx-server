@@ -973,6 +973,7 @@ function warn_and_offer_migration()
         remove_networks
         read_configuration
         start_jenkins
+        exit 0
     else
         echo "No changes will be applied to server.cfg"
     fi
