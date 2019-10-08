@@ -953,7 +953,7 @@ function migrate_s4sdk_to_ppiper_images()
         #TODO: update as soon as there is a new release
         warn_and_offer_migration "ppiper/jenkins-master:v2"
 
-    elif [[ $docker_image =~ ^s4sdk/jenkins-master:latest$ ]]; then
+    elif [[ $docker_image =~ ^s4sdk/jenkins-master:latest$ ]] || [[ $docker_image =~ ^s4sdk/jenkins-master$ ]]; then
         warn_and_offer_migration "ppiper/jenkins-master:latest"
     fi
 
