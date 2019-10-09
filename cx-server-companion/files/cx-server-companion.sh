@@ -947,25 +947,26 @@ function get_port_mapping(){
     return_value=$mapping
 }
 
-function migrate_s4sdk_to_ppiper_images()
-{
-    if [[ $docker_image =~ ^s4sdk/jenkins-master:v[0-9]+$ ]]; then
-        #TODO: update as soon as there is a new release
-        warn_and_offer_migration "ppiper/jenkins-master:v2"
-
-    elif [[ $docker_image =~ ^s4sdk/jenkins-master:latest$ ]] || [[ $docker_image =~ ^s4sdk/jenkins-master$ ]]; then
-        warn_and_offer_migration "ppiper/jenkins-master:latest"
-    fi
-
-}
-
 function warn_and_offer_migration()
 {
-    log_warn "Since October 2019 the s4sdk/jenkins-master image is deprecated. The docker images for the SAP Cloud SDK are now maintained in the repository https://github.com/SAP/devops-docker-cx-server."
-    log_warn "This migration will start the backup of your jenkins-home volume, change the docker_image in server.cfg to $1, stop s4sdk/jenkins-master and finally start ppiper/jenkins-master. Those tasks will result in a few minutes of downtime."
-    read -n 1 -p "Do you want to proceed with the migration? (Y/N): " input
-    echo ""
-    if [[ "$input" == "y" ]] || [[ "$input" == "Y" ]]; then
+    local newImage=$(get_ppiper_jenkins_image_for_migration)
+    echo $newImage
+    if [[ ! -z "$newImage" ]]; then
+        log_warn "Since October 2019 the s4sdk/jenkins-master image is deprecated. The docker images for the SAP Cloud SDK are now maintained in the repository https://github.com/SAP/devops-docker-cx-server."
+        log_warn "This migration will start the backup of your jenkins-home volume, change the docker_image in server.cfg to $newImage, stop s4sdk/jenkins-master and finally start ppiper/jenkins-master. Those tasks will result in a few minutes of downtime."
+        read -n 1 -p "Do you want to proceed with the migration? (Y/N): " input
+        echo ""
+        if [[ "$input" == "y" ]] || [[ "$input" == "Y" ]]; then
+            migrate_s4sdk_to_ppiper_image $newImage
+        else
+            echo "No changes will be applied to server.cfg"
+        fi
+    fi
+}
+
+function migrate_s4sdk_to_ppiper_image()
+{
+    if [[ ! -z "$1" ]]; then
         backup_volume
         sed -i "/docker_image/c\docker_image=\"$1\"" /cx-server/mount/server.cfg
         docker stop s4sdk-jenkins-master
@@ -974,14 +975,26 @@ function warn_and_offer_migration()
         read_configuration
         start_jenkins
         exit 0
+    fi
+}
+
+function get_ppiper_jenkins_image_for_migration()
+{
+    if [[ $docker_image =~ ^s4sdk/jenkins-master:v[0-9]+$ ]]; then
+        #TODO: update as soon as there is a new release
+        echo "ppiper/jenkins-master:v2"
+    elif [[ $docker_image =~ ^s4sdk/jenkins-master:latest$ ]] || [[ $docker_image =~ ^s4sdk/jenkins-master$ ]]; then
+        echo "ppiper/jenkins-master:latest"
     else
-        echo "No changes will be applied to server.cfg"
+        echo ""
     fi
 }
 
 ### Start of Script
 read_configuration
-migrate_s4sdk_to_ppiper_images
+if [ "$1" != "migrate" ]; then
+    warn_and_offer_migration
+fi
 
 # ensure that docker is installed
 command -v docker > /dev/null 2>&1 || { echo >&2 "Docker does not seem to be installed. Please install docker and ensure that the docker command is included in \$PATH."; exit 1; }
@@ -1032,6 +1045,9 @@ elif [ "$1" == "help" ]; then
     warn_low_memory
 elif [ "$1" == "status" ]; then
     node /cx-server/status.js "{\"cache_enabled\": \"${cache_enabled}\"}"
+elif [ "$1" == "migrate" ]; then
+    newImage=$(get_ppiper_jenkins_image_for_migration)
+    migrate_s4sdk_to_ppiper_image $newImage
 else
     display_help "$1"
     warn_low_memory
