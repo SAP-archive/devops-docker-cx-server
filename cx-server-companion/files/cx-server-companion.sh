@@ -954,7 +954,6 @@ function get_port_mapping(){
 function warn_and_offer_migration()
 {
     local newImage=$(get_ppiper_jenkins_image_for_migration)
-    echo $newImage
     if [[ ! -z "$newImage" ]]; then
         log_warn "Since October 2019 the s4sdk/jenkins-master image is deprecated. The docker images for the SAP Cloud SDK are now maintained in the repository https://github.com/SAP/devops-docker-cx-server."
         log_warn "This migration will start the backup of your jenkins-home volume, change the docker_image in server.cfg to $newImage, stop s4sdk/jenkins-master and finally start ppiper/jenkins-master. Those tasks will result in a few minutes of downtime."
