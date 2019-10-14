@@ -643,7 +643,20 @@ function backup_volume()
 
     #ensure that folder exists
     mkdir -p "${backup_folder}"
-    check_disk_space
+    # FNR will skip the header and awk will print only 4th column of the output.
+    local free_space=$(df -h "${backup_folder}" | awk 'FNR > 1 {print $4}')
+    local used_space=$(docker run --rm -v "${jenkins_home}":/jenkins_home_dir "${alpine_docker_image}" du -sh /jenkins_home_dir | awk '{print $1}')
+    log_info "Available free space on the host is ${free_space} and the size of the volume is ${used_space}"
+
+    local free_space_bytes=$(df "${backup_folder}" | awk 'FNR > 1 {print $4}')
+    local used_space_bytes=$(docker run --rm -v "${jenkins_home}":/jenkins_home_dir "${alpine_docker_image}" du -s /jenkins_home_dir | awk '{print $1}')
+    # Defensive estimation: Backup needs twice the volume size (copying + zipping)
+    local estimated_free_space_after_backup=$(expr ${free_space_bytes} - $(expr ${used_space_bytes} \* 2))
+
+    if [[ ${estimated_free_space_after_backup} -lt 0 ]]; then
+      log_error "Not enough disk space for creating a backup. We require twice the size of the volume."
+      exit 1
+    fi
 
     # Backup can be taken when Jenkins server is up
     # https://wiki.jenkins.io/display/JENKINS/Administering+Jenkins
@@ -664,24 +677,6 @@ function backup_volume()
     fi
     log_info "Backup is completed and available in the backup directory. File name is ${backup_file_name}"
     log_info "Please note, this backup contains sensitive information."
-}
-
-function check_disk_space()
-{
-    # FNR will skip the header and awk will print only 4th column of the output.
-    local free_space=$(df -h "${backup_folder}" | awk 'FNR > 1 {print $4}')
-    local used_space=$(docker run --rm -v "${jenkins_home}":/jenkins_home_dir "${alpine_docker_image}" du -sh /jenkins_home_dir | awk '{print $1}')
-    log_info "Available free space on the host is ${free_space} and the size of the volume is ${used_space}"
-
-    local free_space_bytes=$(df "${backup_folder}" | awk 'FNR > 1 {print $4}')
-    local used_space_bytes=$(docker run --rm -v "${jenkins_home}":/jenkins_home_dir "${alpine_docker_image}" du -s /jenkins_home_dir | awk '{print $1}')
-    # Defensive estimation: Backup needs twice the volume size (copying + zipping)
-    local estimated_free_space_after_backup=$(expr ${free_space_bytes} - $(expr ${used_space_bytes} \* 2))
-
-    if [[ ${estimated_free_space_after_backup} -lt 0 ]]; then
-      log_error "Not enough disk space for creating a backup. We require twice the size of the volume."
-      exit 1
-    fi
 }
 
 function command_help_text()
@@ -961,7 +956,6 @@ function warn_and_offer_migration()
         echo ""
         if [[ "$input" == "y" ]] || [[ "$input" == "Y" ]]; then
             log_info "Checking available disk space before migrating"
-            check_disk_space
             migrate_s4sdk_to_ppiper_image $newImage
         else
             echo "No changes will be applied to server.cfg"
