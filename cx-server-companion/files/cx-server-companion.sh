@@ -971,16 +971,14 @@ function warn_and_offer_migration()
 
 function migrate_s4sdk_to_ppiper_image()
 {
-    if [[ ! -z "$1" ]]; then
-        backup_volume
-        sed -i "/docker_image/c\docker_image=\"$1\"" /cx-server/mount/server.cfg
-        docker stop s4sdk-jenkins-master
-        docker rm s4sdk-jenkins-master
-        remove_networks
-        read_configuration
-        start_jenkins
-        exit 0
-    fi
+    backup_volume
+    sed -i "/docker_image/c\docker_image=\"$1\"" /cx-server/mount/server.cfg
+    docker stop s4sdk-jenkins-master
+    docker rm s4sdk-jenkins-master
+    remove_networks
+    read_configuration
+    start_jenkins
+    exit 0
 }
 
 function get_ppiper_jenkins_image_for_migration()
