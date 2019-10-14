@@ -643,6 +643,7 @@ function backup_volume()
 
     #ensure that folder exists
     mkdir -p "${backup_folder}"
+    
     # FNR will skip the header and awk will print only 4th column of the output.
     local free_space=$(df -h "${backup_folder}" | awk 'FNR > 1 {print $4}')
     local used_space=$(docker run --rm -v "${jenkins_home}":/jenkins_home_dir "${alpine_docker_image}" du -sh /jenkins_home_dir | awk '{print $1}')
