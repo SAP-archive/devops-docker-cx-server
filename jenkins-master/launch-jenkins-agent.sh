@@ -26,7 +26,7 @@ else
 fi
 
 echo "Download slave.jar"
-wget http://localhost:8080/jnlpJars/slave.jar
+curl http://localhost:8080/jnlpJars/slave.jar -o slave.jar
 
 echo "Create directory on agent: $REMOTE_DIR"
 $SSH_COMMAND $SSH_USER@$SSH_HOST "mkdir -p $REMOTE_DIR" </dev/null
