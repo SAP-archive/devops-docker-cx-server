@@ -643,21 +643,7 @@ function backup_volume()
 
     #ensure that folder exists
     mkdir -p "${backup_folder}"
-
-    # FNR will skip the header and awk will print only 4th column of the output.
-    local free_space=$(df -h "${backup_folder}" | awk 'FNR > 1 {print $4}')
-    local used_space=$(docker run --rm -v "${jenkins_home}":/jenkins_home_dir "${alpine_docker_image}" du -sh /jenkins_home_dir | awk '{print $1}')
-    log_info "Available free space on the host is ${free_space} and the size of the volume is ${used_space}"
-
-    local free_space_bytes=$(df "${backup_folder}" | awk 'FNR > 1 {print $4}')
-    local used_space_bytes=$(docker run --rm -v "${jenkins_home}":/jenkins_home_dir "${alpine_docker_image}" du -s /jenkins_home_dir | awk '{print $1}')
-    # Defensive estimation: Backup needs twice the volume size (copying + zipping)
-    local estimated_free_space_after_backup=$(expr ${free_space_bytes} - $(expr ${used_space_bytes} \* 2))
-
-    if [[ ${estimated_free_space_after_backup} -lt 0 ]]; then
-      log_error "Not enough disk space for creating a backup. We require twice the size of the volume."
-      exit 1
-    fi
+    check_disk_space
 
     # Backup can be taken when Jenkins server is up
     # https://wiki.jenkins.io/display/JENKINS/Administering+Jenkins
@@ -678,6 +664,24 @@ function backup_volume()
     fi
     log_info "Backup is completed and available in the backup directory. File name is ${backup_file_name}"
     log_info "Please note, this backup contains sensitive information."
+}
+
+function check_disk_space()
+{
+    # FNR will skip the header and awk will print only 4th column of the output.
+    local free_space=$(df -h "${backup_folder}" | awk 'FNR > 1 {print $4}')
+    local used_space=$(docker run --rm -v "${jenkins_home}":/jenkins_home_dir "${alpine_docker_image}" du -sh /jenkins_home_dir | awk '{print $1}')
+    log_info "Available free space on the host is ${free_space} and the size of the volume is ${used_space}"
+
+    local free_space_bytes=$(df "${backup_folder}" | awk 'FNR > 1 {print $4}')
+    local used_space_bytes=$(docker run --rm -v "${jenkins_home}":/jenkins_home_dir "${alpine_docker_image}" du -s /jenkins_home_dir | awk '{print $1}')
+    # Defensive estimation: Backup needs twice the volume size (copying + zipping)
+    local estimated_free_space_after_backup=$(expr ${free_space_bytes} - $(expr ${used_space_bytes} \* 2))
+
+    if [[ ${estimated_free_space_after_backup} -lt 0 ]]; then
+      log_error "Not enough disk space for creating a backup. We require twice the size of the volume."
+      exit 1
+    fi
 }
 
 function command_help_text()
@@ -957,6 +961,8 @@ function warn_and_offer_migration()
         read -n 1 -p "Do you want to proceed with the migration? (Y/N): " input
         echo ""
         if [[ "$input" == "y" ]] || [[ "$input" == "Y" ]]; then
+            log_info "Checking available disk space before migrating"
+            check_disk_space
             migrate_s4sdk_to_ppiper_image $newImage
         else
             echo "No changes will be applied to server.cfg"
@@ -981,8 +987,9 @@ function migrate_s4sdk_to_ppiper_image()
 function get_ppiper_jenkins_image_for_migration()
 {
     if [[ $docker_image =~ ^s4sdk/jenkins-master:v[0-9]+$ ]]; then
-        #TODO: update as soon as there is a new release
-        echo "ppiper/jenkins-master:v2"
+        # get list of all tags: https://stackoverflow.com/questions/28320134/how-to-list-all-tags-for-a-docker-image-on-a-remote-registry
+        tags=`curl -s https://registry.hub.docker.com/v1/repositories/ppiper/jenkins-master/tags -o -  | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}'`
+        echo "ppiper/jenkins-master:${tags##*$'\n'}"
     elif [[ $docker_image =~ ^s4sdk/jenkins-master:latest$ ]] || [[ $docker_image =~ ^s4sdk/jenkins-master$ ]]; then
         echo "ppiper/jenkins-master:latest"
     else
@@ -992,9 +999,7 @@ function get_ppiper_jenkins_image_for_migration()
 
 ### Start of Script
 read_configuration
-if [ "$1" != "migrate" ]; then
-    warn_and_offer_migration
-fi
+warn_and_offer_migration
 
 # ensure that docker is installed
 command -v docker > /dev/null 2>&1 || { echo >&2 "Docker does not seem to be installed. Please install docker and ensure that the docker command is included in \$PATH."; exit 1; }
@@ -1045,9 +1050,6 @@ elif [ "$1" == "help" ]; then
     warn_low_memory
 elif [ "$1" == "status" ]; then
     node /cx-server/status.js "{\"cache_enabled\": \"${cache_enabled}\"}"
-elif [ "$1" == "migrate" ]; then
-    newImage=$(get_ppiper_jenkins_image_for_migration)
-    migrate_s4sdk_to_ppiper_image $newImage
 else
     display_help "$1"
     warn_low_memory
