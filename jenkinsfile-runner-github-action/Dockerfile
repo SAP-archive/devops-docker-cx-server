@@ -2,7 +2,7 @@
 # hadolint ignore=DL3006
 FROM ppiper/jenkins-master
 
-ENV JENKINSFILE_RUNNER_VERSION 1.0-beta-9
+ENV JENKINSFILE_RUNNER_VERSION 1.0-beta-10
 ENV CASC_JENKINS_CONFIG=/github/workspace/jenkins.yml
 
 VOLUME /tmp
