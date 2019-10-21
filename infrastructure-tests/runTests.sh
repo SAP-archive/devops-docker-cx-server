@@ -32,7 +32,7 @@ chmod +x cx-server
 # See `Jenkinsfile` in this directory for details on what is happening.
 docker run -v //var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workspace \
  -e CASC_JENKINS_CONFIG=/workspace/jenkins.yml -e HOST=$(hostname) \
- ppiper/jenkinsfile-runner
+ ppiper/jenkinsfile-runner:v2
 
 # cleanup
 if [ ! "$TRAVIS" = true ] ; then
