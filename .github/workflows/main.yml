@@ -1,11 +1,11 @@
 on: push
-name: Lint all Dockerfiles
+name: Tests
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: Haskell Dockerfile Linter
+    - name: Lint all Dockerfiles
       uses: docker://cdssnc/docker-lint-github-action
       with:
         # https://github.com/hadolint/hadolint/wiki/DL3008
