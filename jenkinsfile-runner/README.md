@@ -20,9 +20,6 @@ To build this image locally, open a terminal in the directory of the Dockerfile 
 docker build -t ppiper/jenkinsfile-runner .
 ```
 
-**Warning:** Building this image will take quite long, as the Jenkinsfile Runner is built from source and has many dependencies.
-Expect high network traffic.
-
 ## Usage
 
 Place a `Jenkinsfile` in the current directory, for example
@@ -57,7 +54,7 @@ docker-compose --file docker-compose.test.yml build
 docker-compose --file docker-compose.test.yml run sut
 ```
 
-If the test passes, the exit code of the command should be `0` and you should see some log output ending in 
+If the test passes, the exit code of the command should be `0` and you should see some log output ending in
 
 ```
 [Pipeline] End of Pipeline
