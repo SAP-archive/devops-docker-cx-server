@@ -196,7 +196,7 @@ cache_enabled=false
 The `cx-server` can be configured to use the TLS certificate for additional security. 
 In order to enable this, set the `tls_enabled` flag to true in the `server.cfg`. 
 It is also important to provide the certificates and a private key to `cx-server`.
-Set the `tls_certificate_directory` in the `server.cfg` to the directory where the certificate and private key(RSA) exists.
+Store the certificate and private key(RSA) files in the `cx-server` directory.
 [Here](self-signed-tls.md) you can find a guide to create your self-signed certificate. 
 Please note that currently the TLS encryption is not supported for the Windows environment.
 
@@ -204,7 +204,6 @@ Example:
 
 ```bash
 tls_enabled=true
-tls_certificate_directory="/var/tls/jenkins"
 https_port="443"
 ```
 
