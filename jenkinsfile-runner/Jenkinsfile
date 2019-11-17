@@ -1,9 +1,33 @@
-node("master") {
-    stage('Test Jenkinsfile Runner Image') {
-        sh 'echo Hello from Jenkins'
-        println("Plugin configuration:")
-        Jenkins.instance.pluginManager.plugins.each{
-            plugin -> println("${plugin.getShortName()}: ${plugin.getVersion()}")
-        }
+def JENKINS_HOME = System.getenv('JENKINS_HOME')
+
+printPlugins(Jenkins.instance.pluginManager.plugins)
+
+@NonCPS
+def printPlugins(plugins) {
+    def pluginsDir
+
+    if (new File(JENKINS_HOME + "/plugins").exists()) {
+        pluginsDir = JENKINS_HOME + "/plugins"
+    } else if (new File("/usr/share/jenkins/ref/plugins").exists()) {
+        pluginsDir = "/usr/share/jenkins/ref/plugins"
+    } else {
+        throw new RuntimeException("Could not determine plugins directory.")
+    }
+
+    plugins.toSorted {
+        a, b -> a.shortName <=> b.shortName
+    }.each {
+        plugin ->
+            def groupId
+            def manifestFile = new File("${pluginsDir}/${plugin.shortName}/META-INF/MANIFEST.MF")
+            manifestFile.withInputStream { mfStream ->
+                def manifest = new java.util.jar.Manifest(mfStream)
+                groupId = manifest.mainAttributes.getValue("Group-Id")
+            }
+            println("""\
+  - groupId: "${groupId}"
+    artifactId: "${plugin.shortName}"
+    source:
+      version: "${plugin.version}\"""")
     }
 }
