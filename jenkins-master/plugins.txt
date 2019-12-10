@@ -45,4 +45,5 @@ warnings-ng
 workflow-aggregator
 workflow-basic-steps
 workflow-cps
+workflow-cps-global-lib-http
 workflow-multibranch
