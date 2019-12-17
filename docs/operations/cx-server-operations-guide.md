@@ -116,7 +116,7 @@ In an event of a server crash, the state of the Jenkins can be restored to a pre
 Example:
 
 ```bash
-./cx-server restore /home/cx-server/backup/jenkins_home_2018-03-07T1528UTC.tar.gz
+./cx-server restore jenkins_home_2018-03-07T1528UTC.tar.gz
 ```
 
 > **Warning:** In order to restore the Jenkins home directory, this command stops the Jenkins server first and **delete the content of the Jenkins home directory**.
