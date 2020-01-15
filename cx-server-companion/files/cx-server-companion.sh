@@ -721,6 +721,7 @@ function restore_volume()
 
     if [[ ! -r "${backup_filepath}" ]]; then
         log_error "Backup file '${backup_filename}' can not be read or does not exist in backup folder."
+
         exit 1
     fi
 
