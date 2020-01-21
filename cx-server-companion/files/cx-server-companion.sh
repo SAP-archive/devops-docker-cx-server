@@ -273,7 +273,10 @@ function stop_jenkins_container()
     echo ""
     echo "Initiating safe shutdown..."
 
-    exitCmd=(docker exec ${jenkins_container_name} curl --noproxy localhost --write-out '%{http_code}' --output /dev/null --silent "${user_and_pass[@]}" -X POST "http://localhost:${container_port_http}/safeExit")
+    crumb_header_snippet=`get_crumb_header_snippet "${jenkins_container_name}" "http://localhost:${container_port_http}" "${user_and_pass[@]}"`
+    [ "$?" != 0 ] && die "Cannot retrieve XSRF crumb. Check log for details" 1
+
+    exitCmd=(docker exec ${jenkins_container_name} curl --noproxy localhost --write-out '%{http_code}' --output /dev/null --silent "${user_and_pass[@]}" ${crumb_header_snippet} -X POST "http://localhost:${container_port_http}/safeExit")
 
     if [ ! -z "${password}" ]; then
         trace_execution "${exitCmd[@]//${password}/******}"
@@ -956,6 +959,39 @@ function get_port_mapping(){
         mapping="${http_port}:${container_port_http}"
     fi
     return_value=$mapping
+}
+
+# Returns a valid header snippet containing the crumb. In case XSRF protection is disabled the empty string is returned.
+function get_crumb_header_snippet {
+
+    local JENKINS_CONTAINER_NAME=$1; shift
+    local HOST=$1; shift
+    local USER_SNIPPET=$@;
+
+    local CRUMB_RESPONSE=$(docker exec ${JENKINS_CONTAINER_NAME} curl -w "\nHTTP_CODE:%{http_code}\n" ${USER_SNIPPET} ${HOST}/crumbIssuer/api/xml?xpath=concat\(//crumbRequestField,%22:%22,//crumb\) 2>/dev/null)
+
+    local HTTP_CODE=$(echo "${CRUMB_RESPONSE}" |grep HTTP_CODE |sed 's/HTTP_CODE://g')
+    local CRUMB_SNIPPET=""
+
+    case "${HTTP_CODE}" in
+        200)
+            CRUMB=$(echo "${CRUMB_RESPONSE}" |grep -v HTTP_CODE)
+            log_info "XSRF-Protection enabled"
+            CRUMB_SNIPPET="-H ${CRUMB}"
+            ;;
+        401)
+            die "Cannot get XSRF crumb. Unauthorized." 7
+            ;;
+        404)
+            log_info "XSRF-Protection not enabled"
+            ;;
+        *)
+            log_warn "Response from retrieving crumb: \"${CRUMB_RESPONSE}\""
+            die "Unexpected response code while retrieving crumb: \"${HTTP_CODE}\"" 8
+            ;;
+    esac
+
+    echo "${CRUMB_SNIPPET}"
 }
 
 ### Start of Script
