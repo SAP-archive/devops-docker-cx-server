@@ -137,7 +137,8 @@ function retry()
 
 function trace_execution()
 {
-    echo -e "\033[1m>>\033[0m" $*
+    echo -e -n "\033[1m>>\033[0m " >&2
+    echo $* >&2
 }
 
 function run()
