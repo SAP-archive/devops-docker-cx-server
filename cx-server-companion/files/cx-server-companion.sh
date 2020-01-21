@@ -968,7 +968,15 @@ function get_crumb_header_snippet {
     local HOST=$1; shift
     local USER_SNIPPET=$@;
 
-    local CRUMB_RESPONSE=$(docker exec ${JENKINS_CONTAINER_NAME} curl -w "\nHTTP_CODE:%{http_code}\n" ${USER_SNIPPET} ${HOST}/crumbIssuer/api/xml?xpath=concat\(//crumbRequestField,%22:%22,//crumb\) 2>/dev/null)
+    CRUMB_CMD=(docker exec ${JENKINS_CONTAINER_NAME} curl -w "\nHTTP_CODE:%{http_code}\n" ${USER_SNIPPET} ${HOST}/crumbIssuer/api/xml?xpath=concat\(//crumbRequestField,%22:%22,//crumb\))
+
+    if [ ! -z "${password}" ]; then
+        trace_execution "${CRUMB_CMD[@]//${password}/******}"
+    else
+        trace_execution "${CRUMB_CMD[@]}"
+    fi
+
+    local CRUMB_RESPONSE=$("${CRUMB_CMD[@]}" 2>/dev/null)
 
     local HTTP_CODE=$(echo "${CRUMB_RESPONSE}" |grep HTTP_CODE |sed 's/HTTP_CODE://g')
     local CRUMB_SNIPPET=""
