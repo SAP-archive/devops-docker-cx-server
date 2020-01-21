@@ -21,6 +21,15 @@ readonly alpine_docker_image='alpine:3.9'
 readonly bold_start="\033[1m"
 readonly bold_end="\033[0m"
 
+function die()
+{
+    local msg=$1; shift
+    local rc=${1:-1}; shift
+    [ -n "${msg}" ] && log_error "${msg}"
+    [ "${rc}" == "0" ] && log_warn "function \"die\" called with exit code \"${rc}\". This indicates a normal termination."
+    exit ${rc}
+}
+
 function log_error()
 {
     echo -e "\033[1;31m[Error]\033[0m $1" >&2
