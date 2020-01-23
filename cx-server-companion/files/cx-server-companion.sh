@@ -273,7 +273,7 @@ function stop_jenkins_container()
     echo ""
     echo "Initiating safe shutdown..."
 
-    crumb_header_snippet=`get_crumb_header_snippet "${jenkins_container_name}" "http://localhost:${container_port_http}" "${user_and_pass[@]}"`
+    crumb_header_snippet=`get_crumb_header_snippet "${jenkins_container_name}" "${container_port_http}" "${user_and_pass[@]}"`
     [ "$?" != 0 ] && die "Cannot retrieve XSRF crumb. Check log for details" 1
 
     exitCmd=(docker exec ${jenkins_container_name} curl --noproxy localhost --write-out '%{http_code}' --output /dev/null --silent "${user_and_pass[@]}" ${crumb_header_snippet} -X POST "http://localhost:${container_port_http}/safeExit")
@@ -965,10 +965,10 @@ function get_port_mapping(){
 function get_crumb_header_snippet {
 
     local JENKINS_CONTAINER_NAME=$1; shift
-    local HOST=$1; shift
+    local PORT=$1; shift
     local USER_SNIPPET=$@;
 
-    CRUMB_CMD=(docker exec ${JENKINS_CONTAINER_NAME} curl -w "\nHTTP_CODE:%{http_code}\n" ${USER_SNIPPET} ${HOST}/crumbIssuer/api/xml?xpath=concat\(//crumbRequestField,%22:%22,//crumb\))
+    CRUMB_CMD=(docker exec ${JENKINS_CONTAINER_NAME} curl -w "\nHTTP_CODE:%{http_code}\n" ${USER_SNIPPET} --noproxy localhost http://localhost:${PORT}/crumbIssuer/api/xml?xpath=concat\(//crumbRequestField,%22:%22,//crumb\))
 
     if [ ! -z "${password}" ]; then
         trace_execution "${CRUMB_CMD[@]//${password}/******}"
