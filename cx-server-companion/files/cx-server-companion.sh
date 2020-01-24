@@ -17,6 +17,7 @@ readonly tls_folder="${cxserver_mount}/tls"
 
 readonly alpine_docker_image='alpine:3.9'
 
+readonly tmp_dir='tmp'
 
 readonly bold_start="\033[1m"
 readonly bold_end="\033[0m"
@@ -270,13 +271,24 @@ function stop_jenkins_container()
         user_and_pass=(-u "${user_name}:${password}")
     fi
 
+    if [ ! -e "${tmp_dir}" ]; then
+        mkdir -p "${tmp_dir}" ||die "Cannot create tmp dir \"${tmp_dir}\"." 1
+    fi
+
+    cookies_file="${tmp_dir}/cookies-$(date +%s).jar"
+
     echo ""
     echo "Initiating safe shutdown..."
 
-    crumb_header_snippet=`get_crumb_header_snippet "${jenkins_container_name}" "${container_port_http}" "${user_and_pass[@]}"`
+    crumb_header_snippet=`get_crumb_header_snippet "${jenkins_container_name}" "${container_port_http}" "${cookies_file}" "${user_and_pass[@]}"`
     [ "$?" != 0 ] && die "Cannot retrieve XSRF crumb. Check log for details" 1
 
-    exitCmd=(docker exec ${jenkins_container_name} curl --noproxy localhost --write-out '%{http_code}' --output /dev/null --silent "${user_and_pass[@]}" ${crumb_header_snippet} -X POST "http://localhost:${container_port_http}/safeExit")
+    cookie_file_snippet=""
+    if [ ! -z "${crumb_header_snippet}" ]; then
+        cookie_file_snippet="--cookie ${cookies_file}"
+    fi
+
+    exitCmd=(docker exec ${jenkins_container_name} curl --noproxy localhost --write-out '%{http_code}' --output /dev/null --silent "${user_and_pass[@]}" ${cookie_file_snippet} ${crumb_header_snippet} -X POST "http://localhost:${container_port_http}/safeExit")
 
     if [ ! -z "${password}" ]; then
         trace_execution "${exitCmd[@]//${password}/******}"
@@ -311,6 +323,8 @@ function stop_jenkins_container()
             exit 1
         fi
     done
+
+    rm -rf "${cookies_file}"
 
     echo -n "Waiting for running jobs to finish..."
     retry 360 5 0 "is_container_status ${jenkins_container_name} 'exited'"
@@ -966,9 +980,10 @@ function get_crumb_header_snippet {
 
     local JENKINS_CONTAINER_NAME=$1; shift
     local PORT=$1; shift
+    local COOKIES_JAR=$1; shift
     local USER_SNIPPET=$@;
 
-    CRUMB_CMD=(docker exec ${JENKINS_CONTAINER_NAME} curl -w "\nHTTP_CODE:%{http_code}\n" ${USER_SNIPPET} --noproxy localhost http://localhost:${PORT}/crumbIssuer/api/xml?xpath=concat\(//crumbRequestField,%22:%22,//crumb\))
+    CRUMB_CMD=(docker exec ${JENKINS_CONTAINER_NAME} curl -w "\nHTTP_CODE:%{http_code}\n" ${USER_SNIPPET} --cookie-jar "${COOKIES_JAR}" --noproxy localhost http://localhost:${PORT}/crumbIssuer/api/xml?xpath=concat\(//crumbRequestField,%22:%22,//crumb\))
 
     if [ ! -z "${password}" ]; then
         trace_execution "${CRUMB_CMD[@]//${password}/******}"
