@@ -17,9 +17,19 @@ readonly tls_folder="${cxserver_mount}/tls"
 
 readonly alpine_docker_image='alpine:3.9'
 
+readonly tmp_dir='tmp'
 
 readonly bold_start="\033[1m"
 readonly bold_end="\033[0m"
+
+function die()
+{
+    local msg=$1; shift
+    local rc=${1:-1}; shift
+    [ -n "${msg}" ] && log_error "${msg}"
+    [ "${rc}" == "0" ] && log_warn "function \"die\" called with exit code \"${rc}\". This indicates a normal termination."
+    exit ${rc}
+}
 
 function log_error()
 {
@@ -137,7 +147,8 @@ function retry()
 
 function trace_execution()
 {
-    echo -e "\033[1m>>\033[0m" $*
+    echo -e -n "\033[1m>>\033[0m " >&2
+    echo $* >&2
 }
 
 function run()
@@ -260,10 +271,24 @@ function stop_jenkins_container()
         user_and_pass=(-u "${user_name}:${password}")
     fi
 
+    if [ ! -e "${tmp_dir}" ]; then
+        mkdir -p "${tmp_dir}" ||die "Cannot create tmp dir \"${tmp_dir}\"." 1
+    fi
+
+    cookies_file="${tmp_dir}/cookies-$(date +%s).jar"
+
     echo ""
     echo "Initiating safe shutdown..."
 
-    exitCmd=(docker exec ${jenkins_container_name} curl --noproxy localhost --write-out '%{http_code}' --output /dev/null --silent "${user_and_pass[@]}" -X POST "http://localhost:${container_port_http}/safeExit")
+    crumb_header_snippet=`get_crumb_header_snippet "${jenkins_container_name}" "${container_port_http}" "${cookies_file}" "${user_and_pass[@]}"`
+    [ "$?" != 0 ] && die "Cannot retrieve XSRF crumb. Check log for details" 1
+
+    cookie_file_snippet=""
+    if [ ! -z "${crumb_header_snippet}" ]; then
+        cookie_file_snippet="--cookie ${cookies_file}"
+    fi
+
+    exitCmd=(docker exec ${jenkins_container_name} curl --noproxy localhost --write-out '%{http_code}' --output /dev/null --silent "${user_and_pass[@]}" ${cookie_file_snippet} ${crumb_header_snippet} -X POST "http://localhost:${container_port_http}/safeExit")
 
     if [ ! -z "${password}" ]; then
         trace_execution "${exitCmd[@]//${password}/******}"
@@ -298,6 +323,8 @@ function stop_jenkins_container()
             exit 1
         fi
     done
+
+    rm -rf "${cookies_file}"
 
     echo -n "Waiting for running jobs to finish..."
     retry 360 5 0 "is_container_status ${jenkins_container_name} 'exited'"
@@ -946,6 +973,48 @@ function get_port_mapping(){
         mapping="${http_port}:${container_port_http}"
     fi
     return_value=$mapping
+}
+
+# Returns a valid header snippet containing the crumb. In case XSRF protection is disabled the empty string is returned.
+function get_crumb_header_snippet {
+
+    local JENKINS_CONTAINER_NAME=$1; shift
+    local PORT=$1; shift
+    local COOKIES_JAR=$1; shift
+    local USER_SNIPPET=$@;
+
+    CRUMB_CMD=(docker exec ${JENKINS_CONTAINER_NAME} curl -w "\nHTTP_CODE:%{http_code}\n" ${USER_SNIPPET} --cookie-jar "${COOKIES_JAR}" --noproxy localhost http://localhost:${PORT}/crumbIssuer/api/xml?xpath=concat\(//crumbRequestField,%22:%22,//crumb\))
+
+    if [ ! -z "${password}" ]; then
+        trace_execution "${CRUMB_CMD[@]//${password}/******}"
+    else
+        trace_execution "${CRUMB_CMD[@]}"
+    fi
+
+    local CRUMB_RESPONSE=$("${CRUMB_CMD[@]}" 2>/dev/null)
+
+    local HTTP_CODE=$(echo "${CRUMB_RESPONSE}" |grep HTTP_CODE |sed 's/HTTP_CODE://g')
+    local CRUMB_SNIPPET=""
+
+    case "${HTTP_CODE}" in
+        200)
+            CRUMB=$(echo "${CRUMB_RESPONSE}" |grep -v HTTP_CODE)
+            log_info "XSRF-Protection enabled"
+            CRUMB_SNIPPET="-H ${CRUMB}"
+            ;;
+        401)
+            die "Cannot get XSRF crumb. Unauthorized." 7
+            ;;
+        404)
+            log_info "XSRF-Protection not enabled"
+            ;;
+        *)
+            log_warn "Response from retrieving crumb: \"${CRUMB_RESPONSE}\""
+            die "Unexpected response code while retrieving crumb: \"${HTTP_CODE}\"" 8
+            ;;
+    esac
+
+    echo "${CRUMB_SNIPPET}"
 }
 
 ### Start of Script
