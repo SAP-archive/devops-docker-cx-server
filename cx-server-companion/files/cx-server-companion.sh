@@ -9,7 +9,7 @@ readonly container_port_https=8443
 readonly network_name='cx-network'
 #Two times rev in combination with cut -f1 returns the last element of the cgroup which corresponds to the container id
 #Returns f323454ad3402f2513712 applied to 10:name=systemd:/docker/f323454ad3402f2513712
-readonly cxserver_companion_container_id="$(head -n 1 /proc/self/cgroup | rev | cut -d '/' -f1 | rev)"
+readonly cxserver_companion_container_id="$(grep memory /proc/self/cgroup | rev | cut -d '/' -f1 | rev)"
 
 readonly cxserver_mount=/cx-server/mount
 readonly backup_folder="${cxserver_mount}/backup"
