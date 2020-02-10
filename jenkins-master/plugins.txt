@@ -39,6 +39,7 @@ pipeline-utility-steps
 pmd
 rebuild
 saferestart
+sonar
 ssh-agent
 timestamper
 warnings-ng
