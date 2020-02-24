@@ -26,7 +26,7 @@ jobs:
         # Check for 'SEVERE' messages in Jenkins log (usually caused by plugin or configuration issues)
         docker logs cx-jenkins-master-test 2> >(grep --quiet SEVERE)
         # Print plugin config
-        docker exec cx-jenkins-master-test bash -c "http://localhost:8080/pluginManager/api/xml?depth=1"
+        docker exec cx-jenkins-master-test bash -c "curl http://localhost:8080/pluginManager/api/xml?depth=1"
 
     - name: Print full log for good measure
       run: docker logs cx-jenkins-master-test
