@@ -17,11 +17,9 @@ jobs:
         docker exec cx-jenkins-master-test timeout 300 bash -c "until curl --fail http://localhost:8080/api/json; do sleep 5; done"
         # Check for 'SEVERE' messages in Jenkins log (usually caused by plugin or configuration issues)
         docker logs cx-jenkins-master-test 2> >(grep --quiet SEVERE)
-    - name: Tag tested image
-      run: docker tag ppiper/jenkins-master:RC ppiper/jenkins-master:${GITHUB_REF##*/}
-    - name: Push to Docker Hub (only on master branch)
-      if: github.ref == 'refs/heads/master'
+    - name: Push to Docker Hub
       run: |
+        docker tag ppiper/jenkins-master:RC ppiper/jenkins-master:${GITHUB_REF##*/}
         echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
         docker push ppiper/jenkins-master:${GITHUB_REF##*/}
         rm -f /home/runner/.docker/config.json
