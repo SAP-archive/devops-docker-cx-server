@@ -2,7 +2,7 @@
 
 readonly jenkins_container_name='cx-jenkins-master'
 readonly nexus_container_name='cx-nexus'
-readonly cache_docker_image='sonatype/nexus3:3.14.0'
+readonly cache_docker_image='sonatype/nexus3:3.21.1'
 readonly cxserver_companion_docker_image='ppiper/cx-server-companion'
 readonly container_port_http=8080
 readonly container_port_https=8443
@@ -456,7 +456,7 @@ function start_nexus_container()
         local environment_variable_parameters=()
         if [ ! -z "${x_nexus_java_opts}" ]; then
             local container_java_opts="$(get_image_environment_variable "${cache_docker_image}" INSTALL4J_ADD_VM_PARAMS)"
-            environment_variable_parameters+=(-e "INSTALL4J_ADD_VM_PARAMS=${container_java_opts} ${x_nexus_java_opts}")
+            environment_variable_parameters+=(-e NEXUS_SECURITY_RANDOMPASSWORD=false -e "INSTALL4J_ADD_VM_PARAMS=${container_java_opts} ${x_nexus_java_opts}")
         fi
 
         # Read proxy parameters separated by new line
