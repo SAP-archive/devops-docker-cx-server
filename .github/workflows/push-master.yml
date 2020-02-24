@@ -1,19 +1,11 @@
 on: push
-name: Lint all Dockerfiles
+name: Build images
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: Haskell Dockerfile Linter
-      uses: docker://cdssnc/docker-lint-github-action
-      with:
-        # https://github.com/hadolint/hadolint/wiki/DL3008
-        # https://github.com/hadolint/hadolint/wiki/DL3013
-        # https://github.com/hadolint/hadolint/wiki/DL3016
-        # https://github.com/hadolint/hadolint/wiki/DL3018
-        args: --ignore DL3008 --ignore DL3013 --ignore DL3016 --ignore DL3018
-    - name: Build and smoke-test the Docker image
+    - name: Build and smoke-test a release candidate of the Docker image
       run: |
         docker build jenkins-master --tag ppiper/jenkins-master:RC
         docker run --name cx-jenkins-master-test --detach --publish 8080:8080 \
@@ -23,5 +15,11 @@ jobs:
         docker exec cx-jenkins-master-test timeout 300 bash -c "until curl --fail http://localhost:8080/api/json; do sleep 5; done"
         # Check for 'SEVERE' messages in Jenkins log (usually caused by plugin or configuration issues)
         docker logs cx-jenkins-master-test 2> >(grep --quiet SEVERE)
-    - name: Debug
-      run: docker images
+    - name: Tag tested image
+      run: docker tag ppiper/jenkins-master:RC ppiper/jenkins-master:latest
+    - name: Push to Docker Hub (only on master branch)
+      if: github.ref == 'refs/heads/master'
+      run: |
+        echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
+        docker push ppiper/jenkins-master:latest
+        rm -f /home/runner/.docker/config.json
