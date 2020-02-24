@@ -13,6 +13,10 @@ jobs:
     - uses: actions/checkout@master
     - name: Build and smoke-test a release candidate of the Docker image
       run: |
+        # Create a backup of the image to allow rollback in case of failure
+        docker pull ppiper/jenkins-master:latest
+        docker tag ppiper/jenkins-master:latest ppiper/jenkins-master:backup-of-latest
+        # Build and test the image RC
         docker build jenkins-master --tag ppiper/jenkins-master:RC
         docker run --name cx-jenkins-master-test --detach --publish 8080:8080 \
           -v /var/run/docker.sock:/var/run/docker.sock \
@@ -21,6 +25,9 @@ jobs:
         docker exec cx-jenkins-master-test timeout 300 bash -c "until curl --fail http://localhost:8080/api/json; do sleep 5; done"
         # Check for 'SEVERE' messages in Jenkins log (usually caused by plugin or configuration issues)
         docker logs cx-jenkins-master-test 2> >(grep --quiet SEVERE)
+        # Print plugin config
+        docker exec cx-jenkins-master-test bash -c "http://localhost:8080/pluginManager/api/xml?depth=1"
+
     - name: Print full log for good measure
       run: docker logs cx-jenkins-master-test
     - name: Push to Docker Hub (only on master branch)
@@ -28,5 +35,6 @@ jobs:
       run: |
         docker tag ppiper/jenkins-master:RC ppiper/jenkins-master:latest
         echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
+        docker push ppiper/jenkins-master:backup-of-latest
         docker push ppiper/jenkins-master:latest
         rm -f /home/runner/.docker/config.json
