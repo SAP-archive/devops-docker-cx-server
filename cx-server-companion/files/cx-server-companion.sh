@@ -456,7 +456,7 @@ function start_nexus_container()
         local environment_variable_parameters=()
         if [ ! -z "${x_nexus_java_opts}" ]; then
             local container_java_opts="$(get_image_environment_variable "${cache_docker_image}" INSTALL4J_ADD_VM_PARAMS)"
-            environment_variable_parameters+=(-e NEXUS_SECURITY_RANDOMPASSWORD=false -e "INSTALL4J_ADD_VM_PARAMS=${container_java_opts} ${x_nexus_java_opts}")
+            environment_variable_parameters+=(-e "INSTALL4J_ADD_VM_PARAMS=${container_java_opts} ${x_nexus_java_opts}")
         fi
 
         # Read proxy parameters separated by new line
@@ -464,6 +464,8 @@ function start_nexus_container()
         local IFS=$'\n'
         environment_variable_parameters+=($(get_proxy_parameters "${cache_docker_image}"))
         IFS=${old_IFS}
+
+        environment_variable_parameters+=(-e NEXUS_SECURITY_RANDOMPASSWORD=false)
 
         print_nexus_config
 
