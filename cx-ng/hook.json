@@ -1,0 +1,15 @@
+[
+    {
+      "id": "webhook",
+      "execute-command": "/home/user/script.sh",
+      "command-working-directory": "/home/user/",
+      "response-message": "I got the payload!",
+      "response-headers":
+      [
+        {
+          "name": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    }
+  ]
