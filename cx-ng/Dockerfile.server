@@ -1,0 +1,11 @@
+FROM debian:buster
+RUN apt-get -y update && apt-get -y install webhook git
+
+COPY script.sh /root
+RUN chmod +x /root/script.sh
+COPY hook.json /root
+
+ADD https://github.com/nektos/act/releases/download/v0.2.6/act_Linux_x86_64.tar.gz /act.tgz
+RUN mkdir -p /opt/act; tar xzf /act.tgz -C /opt/act
+
+ENTRYPOINT [ "webhook", "-hooks", "/root/hook.json", "-verbose" ]

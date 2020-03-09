@@ -1,8 +1,8 @@
 [
     {
       "id": "webhook",
-      "execute-command": "/home/user/script.sh",
-      "command-working-directory": "/home/user/",
+      "execute-command": "/root/script.sh",
+      "command-working-directory": "/root/",
       "response-message": "I got the payload!",
       "response-headers":
       [

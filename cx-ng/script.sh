@@ -4,4 +4,4 @@ dir=$(mktemp -d)
 cd $dir
 git clone -b piper-action https://github.com/SAP/cloud-s4-sdk-book repo
 cd repo
-/opt/act/act
+/opt/act/act -P ubuntu-18.04=mybuilder

@@ -18,20 +18,16 @@ RUN mkdir -p /opt/act; tar xzf /act.tgz -C /opt/act
 
 FROM debian:buster
 
-RUN apt-get -y update && apt-get -y install webhook git
 
 COPY --from=builder /opt /opt
 
 RUN mkdir /home/user && echo "user:x:1002:1002:user:/home/user:/bin/bash" >> /etc/passwd
-COPY script.sh /home/user
-RUN chmod +x /home/user/script.sh
-COPY hook.json /home/user
+
 RUN chown -R user /home/user
 
-#USER user
-RUN echo "PATH=/opt/act:/opt/apache-maven-${MAVEN_VERSION}/bin:/opt/node-${NODE_VERSION}-linux-x64/bin:/opt/sapmachine-jdk-${JVM_VERSION}/bin:$PATH" >> /root/.bashrc
+USER user
+RUN echo "PATH=/opt/act:/opt/apache-maven-${MAVEN_VERSION}/bin:/opt/node-${NODE_VERSION}-linux-x64/bin:/opt/sapmachine-jdk-${JVM_VERSION}/bin:$PATH" >> /home/user/.bashrc
 
 WORKDIR /home/user
 
-ENTRYPOINT [ "webhook", "-hooks", "/home/user/hook.json", "-verbose" ]
 
