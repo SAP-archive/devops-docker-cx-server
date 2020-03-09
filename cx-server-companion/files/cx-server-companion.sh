@@ -2,7 +2,7 @@
 
 readonly jenkins_container_name='cx-jenkins-master'
 readonly nexus_container_name='cx-nexus'
-readonly cache_docker_image='sonatype/nexus3:3.14.0'
+readonly cache_docker_image='sonatype/nexus3:3.21.1'
 readonly cxserver_companion_docker_image='ppiper/cx-server-companion'
 readonly container_port_http=8080
 readonly container_port_https=8443
@@ -464,6 +464,8 @@ function start_nexus_container()
         local IFS=$'\n'
         environment_variable_parameters+=($(get_proxy_parameters "${cache_docker_image}"))
         IFS=${old_IFS}
+
+        environment_variable_parameters+=(-e NEXUS_SECURITY_RANDOMPASSWORD=false)
 
         print_nexus_config
 
