@@ -745,7 +745,14 @@ function restore_volume()
         exit 1
     fi
 
-    local backup_filename="${1}"
+    local backup_filename
+
+    if [[ "${1}" == *"/"* ]]; then
+        backup_filename=$(echo "${1}" | sed 's|.*/||')
+    else
+        backup_filename="${1}"
+    fi
+
     local backup_filepath="${backup_folder}/${backup_filename}"
 
     if [[ ! -r "${backup_filepath}" ]]; then
