@@ -3,7 +3,7 @@ on:
     types: [published]
 name: Build images
 jobs:
-  build:
+  jenkins-master:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -22,4 +22,32 @@ jobs:
         docker tag ppiper/jenkins-master:RC ppiper/jenkins-master:${GITHUB_REF##*/}
         echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
         docker push ppiper/jenkins-master:${GITHUB_REF##*/}
+        rm -f /home/runner/.docker/config.json
+
+  jenkins-agent:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Build and smoke-test a release candidate of the Docker image
+      run: |
+        docker build jenkins-agent --tag ppiper/jenkins-agent:RC
+    - name: Push to Docker Hub
+      run: |
+        docker tag ppiper/jenkins-agent:RC ppiper/jenkins-agent:${GITHUB_REF##*/}
+        echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
+        docker push ppiper/jenkins-agent:${GITHUB_REF##*/}
+        rm -f /home/runner/.docker/config.json
+
+  jenkins-agent-k8s:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Build and smoke-test a release candidate of the Docker image
+      run: |
+        docker build jenkins-agent-k8s --tag ppiper/jenkins-agent-k8s:RC
+    - name: Push to Docker Hub
+      run: |
+        docker tag ppiper/jenkins-agent-k8s:RC ppiper/jenkins-agent-k8s:${GITHUB_REF##*/}
+        echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
+        docker push ppiper/jenkins-agent-k8s:${GITHUB_REF##*/}
         rm -f /home/runner/.docker/config.json

@@ -7,17 +7,14 @@ on:
 
 name: Build images
 jobs:
-  build:
+  jenkins-master:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
     - name: Build and smoke-test a release candidate of the Docker image
       run: |
-        # Create a backup of the image to allow rollback in case of failure
-        docker pull ppiper/jenkins-master:latest
-        docker tag ppiper/jenkins-master:latest ppiper/jenkins-master:backup-of-latest
-        # Build and test the image RC
-        docker build jenkins-master --tag ppiper/jenkins-master:RC
+        ./build-image.sh ppiper/jenkins-master jenkins-master
+        # Test image
         docker run --name cx-jenkins-master-test --detach --publish 8080:8080 \
           -v /var/run/docker.sock:/var/run/docker.sock \
           ppiper/jenkins-master:RC
@@ -28,13 +25,37 @@ jobs:
         # Print plugin config
         docker exec cx-jenkins-master-test bash -c "curl http://localhost:8080/pluginManager/api/xml?depth=1"
 
-    - name: Print full log for good measure
-      run: docker logs cx-jenkins-master-test
     - name: Push to Docker Hub (only on master branch)
       if: github.ref == 'refs/heads/master'
       run: |
-        docker tag ppiper/jenkins-master:RC ppiper/jenkins-master:latest
         echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
-        docker push ppiper/jenkins-master:backup-of-latest
-        docker push ppiper/jenkins-master:latest
+        ./push-image.sh ppiper/jenkins-master
+        rm -f /home/runner/.docker/config.json
+
+  jenkins-agent:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Build and smoke-test a release candidate of the Docker image
+      run: ./build-image.sh ppiper/jenkins-agent jenkins-agent
+
+    - name: Push to Docker Hub (only on master branch)
+      if: github.ref == 'refs/heads/master'
+      run: |
+        echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
+        ./push-image.sh ppiper/jenkins-agent
+        rm -f /home/runner/.docker/config.json
+
+  jenkins-agent-k8s:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Build and smoke-test a release candidate of the Docker image
+      run: ./build-image.sh ppiper/jenkins-agent-k8s jenkins-agent-k8s
+
+    - name: Push to Docker Hub (only on master branch)
+      if: github.ref == 'refs/heads/master'
+      run: |
+        echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
+        ./push-image.sh ppiper/jenkins-agent-k8s
         rm -f /home/runner/.docker/config.json
