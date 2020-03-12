@@ -18,8 +18,10 @@ docker tag localhost:5000/ppiper/cx-server-companion:latest ppiper/cx-server-com
 docker push localhost:5000/ppiper/jenkins-master:latest
 docker push localhost:5000/ppiper/cx-server-companion:latest
 
+export DEVELOPER_MODE=1
+
 # Boot our unit-under-test Jenkins master instance using the `cx-server` script
-TEST_ENVIRONMENT=(CX_INFRA_IT_CF_USERNAME CX_INFRA_IT_CF_PASSWORD)
+TEST_ENVIRONMENT=(CX_INFRA_IT_CF_USERNAME CX_INFRA_IT_CF_PASSWORD DEVELOPER_MODE)
 for var in "${TEST_ENVIRONMENT[@]}"
 do
    export $var
