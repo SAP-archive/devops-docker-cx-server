@@ -59,3 +59,17 @@ jobs:
         echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
         ./push-image.sh ppiper/jenkins-agent-k8s
         rm -f /home/runner/.docker/config.json
+
+  cx-server-companion:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Build and smoke-test a release candidate of the Docker image
+      run: ./build-image.sh ppiper/cx-server-companion cx-server-companion
+
+    - name: Push to Docker Hub (only on master branch)
+      if: github.ref == 'refs/heads/master'
+      run: |
+        echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
+        ./push-image.sh ppiper/cx-server-companion
+        rm -f /home/runner/.docker/config.json

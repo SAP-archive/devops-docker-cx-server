@@ -12,7 +12,6 @@ jobs:
       - name: Prepare Release
         run: |
           set -x
-          curl --silent "https://api.github.com/repos/SAP/devops-docker-cx-server/releases/latest" | jq -r .tag_name
           CURRENT_VERSION_LONG=$(curl --silent "https://api.github.com/repos/SAP/devops-docker-cx-server/releases/latest" | jq -r .tag_name)
           CURRENT_VERSION=`echo $CURRENT_VERSION_LONG | cut -c 2-`
           NEXT_VERSION=$(expr $CURRENT_VERSION + 1)
