@@ -9,3 +9,5 @@ else
     echo "The cx-server and the server.cfg files have been successfully generated."
     echo "Execute ./cx-server help command to know more about the cx-server script"
 fi
+
+echo "Make sure to secure your Jenkins instance, see https://jenkins.io/doc/book/system-administration/security/"
