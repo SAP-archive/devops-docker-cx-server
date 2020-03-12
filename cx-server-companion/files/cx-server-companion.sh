@@ -523,7 +523,7 @@ function start_jenkins()
 A random password was created for admin, if your Jenkins instance was not secured already.
 Run docker logs -f cx-jenkins-master 2>&1 | grep "Default credentials for Jenkins"
 to find the default credentials. This might take a few minutes to complete.
-We recommend to change the default password immediately.'; fi
+We recommend to change the default password immediately.'
 }
 
 function start_jenkins_container()
