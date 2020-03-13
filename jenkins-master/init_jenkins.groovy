@@ -24,7 +24,9 @@ try {
     initProxy()
     initExecutors()
     initLibraries()
-    if (!instance.isUseSecurity()) {
+    if (System.getenv()['DEVELOPER_MODE']) {
+        println("Running in developer mode, no security is enforced.")
+    } else if (!instance.isUseSecurity()) {
         initAdminUser()
     }
 }
