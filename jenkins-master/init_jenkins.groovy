@@ -24,6 +24,13 @@ try {
     initProxy()
     initExecutors()
     initLibraries()
+
+    // debug
+    System.getenv().each {
+        println(it)
+    }
+    println("instance.isUseSecurity() ${instance.isUseSecurity()}")
+
     if (System.getenv()['DEVELOPER_MODE']) {
         println("Running in developer mode, no security is enforced.")
     } else if (!instance.isUseSecurity()) {
@@ -38,6 +45,12 @@ catch(Throwable t) {
 def initAdminUser() {
     // cf https://github.com/jenkinsci/docker/issues/310
     instance.setSecurityRealm(new HudsonPrivateSecurityRealm(false))
+
+    //debug
+    instance.getSecurityRealm().getAllUsers().each {
+        println(it)
+    }
+
     String username = 'admin'
     String password = java.util.UUID.randomUUID()
     def user = instance.getSecurityRealm().createAccount(username, password)

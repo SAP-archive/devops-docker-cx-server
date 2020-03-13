@@ -747,6 +747,7 @@ function display_help()
     command_help_text 'restore'       "Restores the content of the configured 'jenkins_home' by the contents of the provided backup file. Usage: 'cx-server restore <name of the backup file>'."
     command_help_text 'update script' "Explicitly pull the Docker image containing this script to update to its latest version. Running this is not required, since the image is updated automatically."
     command_help_text 'update image'  "Updates the configured 'docker_image' to the newest available version of Cx Server image on Docker Hub."
+    command_help_text 'initial-credentials' "Shows initial admin credentials."
     command_help_text 'help'          "Shows this help text."
 }
 
