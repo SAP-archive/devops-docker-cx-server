@@ -4,6 +4,9 @@ Please be aware that running a Jenkins in production securly is not a trivial ta
 
 Some recommendations:
 
+Jenkins has a default password for the `admin` account set.
+You can get it by running `./cx-server initial-credentials` once your Jenkins is up and running.
+
 The `latest` tag of the CX Server Docker images are rebuilt on a regular basis.
 To benefit from updated Jenkins core and plugin versions, you should stop, remove, and restart your CX Server instance on a regular basis.
 Part of this procedure should be to take backups (see `backup` and `restore` commands of `cx-server`).

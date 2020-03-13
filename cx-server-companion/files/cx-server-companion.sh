@@ -522,8 +522,9 @@ function start_jenkins()
     if [ -z ${DEVELOPER_MODE} ]; then
         log_warn 'Please ensure your Jenkins instance is appropriatly secured, see: https://jenkins.io/doc/book/system-administration/security/
 A random password was created for admin, if your Jenkins instance was not secured already.
-Run docker logs -f cx-jenkins-master 2>&1 | grep "Default credentials for Jenkins"
-to find the default credentials. This might take a few minutes to complete.
+Run "./cx-server initial-credentials" to find the default credentials.
+This might take a few minutes to complete.
+
 We recommend to change the default password immediately.'
     fi
 
@@ -1082,6 +1083,8 @@ elif [ "$1" == "help" ]; then
     warn_low_memory
 elif [ "$1" == "status" ]; then
     node /cx-server/status.js "{\"cache_enabled\": \"${cache_enabled}\"}"
+elif [ "$1" == "initial-credentials" ]; then
+    docker logs cx-jenkins-master 2>&1 | grep "Default credentials for Jenkins"
 else
     display_help "$1"
     warn_low_memory
