@@ -519,13 +519,11 @@ function start_jenkins()
         log_info "Cx Server is already running."
     fi
 
-    if [ -z ${DEVELOPER_MODE} ]; then
-        log_warn 'Please ensure your Jenkins instance is appropriatly secured, see: https://jenkins.io/doc/book/system-administration/security/
+    log_warn 'Please ensure your Jenkins instance is appropriatly secured, see: https://jenkins.io/doc/book/system-administration/security/
 A random password was created for admin, if your Jenkins instance was not secured already.
 Run docker logs -f cx-jenkins-master 2>&1 | grep "Default credentials for Jenkins"
 to find the default credentials. This might take a few minutes to complete.
 We recommend to change the default password immediately.'
-    fi
 
 }
 
@@ -649,8 +647,6 @@ function start_jenkins_container()
         do
             environment_variable_parameters+=(-e $var)
         done
-
-        environment_variable_parameters+=(-e DEVELOPER_MODE)
 
         if [ ! -z "${cx_server_path}" ]; then
             if [ "${host_os}" = windows ] ; then
