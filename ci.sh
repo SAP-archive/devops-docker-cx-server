@@ -1,10 +1,6 @@
 #!/bin/bash
-#set -o nounset
 set -o errexit
 
-set -x
-
-# valid values: latest or a tag v{N}
 VERSION=$1
 DOCKERHUB_USER=$2
 DOCKERHUB_PASSWORD=$3
