@@ -34,19 +34,27 @@ docker run -v //var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workspace \
  -e CASC_JENKINS_CONFIG=/workspace/jenkins.yml -e HOST=$(hostname) \
  ppiper/jenkinsfile-runner:v2
 
-#todo assert here
-INITIAL_CREDENTIALS=$(./cx-server initial-credentials)
+# Test Jenkins default admin credentials
+INITIAL_CREDENTIALS=$(docker logs cx-jenkins-master 2>&1 | grep "Default credentials for Jenkins")
 echo $INITIAL_CREDENTIALS
 ADMIN_PASSWORD=$(echo ${INITIAL_CREDENTIALS} | cut -c 63-)
 echo $ADMIN_PASSWORD
 
 # Expect code 403
-CODE_WITHOUT_AUTH=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost/createItem)
-echo $CODE_WITHOUT_AUTH
+ACTUAL_STATUS_CODE_WITHOUT_AUTH=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost/createItem)
+echo $ACTUAL_STATUS_CODE_WITHOUT_AUTH
+if [ "$ACTUAL_STATUS_CODE_WITHOUT_AUTH" != "403" ]; then
+    echo Expected status 403, but got $ACTUAL_STATUS_CODE_WITHOUT_AUTH
+    exit 122
+fi
 
 # Expect code 400
-CODE_WITH_AUTH=$(curl --user admin:$ADMIN_PASSWORD -X POST -s -o /dev/null -w "%{http_code}" http://localhost/createItem)
-echo $CODE_WITH_AUTH
+ACTUAL_STATUS_CODE_WITH_AUTH=$(curl --user admin:$ADMIN_PASSWORD -X POST -s -o /dev/null -w "%{http_code}" http://localhost/createItem)
+echo $ACTUAL_STATUS_CODE_WITH_AUTH
+if [ "$ACTUAL_STATUS_CODE_WITH_AUTH" != "400" ]; then
+    echo Expected status 400, but got $ACTUAL_STATUS_CODE_WITH_AUTH
+    exit 123
+fi
 
 # cleanup
 if [ ! "$TRAVIS" = true ] ; then
