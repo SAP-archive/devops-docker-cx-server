@@ -36,14 +36,17 @@ docker run -v //var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workspace \
 
 #todo assert here
 INITIAL_CREDENTIALS=$(./cx-server initial-credentials)
+echo $INITIAL_CREDENTIALS
 ADMIN_PASSWORD=$(echo ${INITIAL_CREDENTIALS} | cut -c 63-)
+echo $ADMIN_PASSWORD
 
+# Expect code 403
+CODE_WITHOUT_AUTH=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost/createItem)
+echo $CODE_WITHOUT_AUTH
 
-#403
-curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost/createItem
-
-#400
-curl --user admin:$ADMIN_PASSWORD -X POST -s -o /dev/null -w "%{http_code}" http://localhost/createItem
+# Expect code 400
+CODE_WITH_AUTH=$(curl --user admin:$ADMIN_PASSWORD -X POST -s -o /dev/null -w "%{http_code}" http://localhost/createItem)
+echo $CODE_WITH_AUTH
 
 # cleanup
 if [ ! "$TRAVIS" = true ] ; then
