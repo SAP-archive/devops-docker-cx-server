@@ -9,5 +9,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: Build and smoke-test a release candidate of the Docker image
+    - name: Build, test and push
       run: ./ci.sh ${GITHUB_REF##*/} ${{ secrets.DOCKERHUB_PASSWORD }} ${{ secrets.DOCKERHUB_USER }}

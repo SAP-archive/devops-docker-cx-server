@@ -22,5 +22,5 @@ jobs:
           command: githubPublishRelease
           flags: --token ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and smoke-test a release candidate of the Docker image
+      - name: Build, test and push
         run: ./ci.sh ${PIPER_version} ${{ secrets.DOCKERHUB_PASSWORD }} ${{ secrets.DOCKERHUB_USER }}
