@@ -1,6 +1,6 @@
 # Notes on running CX Server in Production
 
-Please be aware that running a Jenkins in production securly is not a trivial task.
+Please be aware that running a Jenkins in production securely is not a trivial task.
 
 Some recommendations:
 
