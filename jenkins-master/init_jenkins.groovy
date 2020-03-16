@@ -41,7 +41,6 @@ catch(Throwable t) {
     throw new Error("Failed to properly initialize Piper Jenkins. Please check the logs for more details.", t);
 }
 
-
 def initAdminUser() {
     // cf https://github.com/jenkinsci/docker/issues/310
     instance.setSecurityRealm(new HudsonPrivateSecurityRealm(false))

@@ -35,7 +35,15 @@ docker run -v //var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workspace \
  ppiper/jenkinsfile-runner:v2
 
 #todo assert here
-./cx-server initial-credentials
+INITIAL_CREDENTIALS=$(./cx-server initial-credentials)
+ADMIN_PASSWORD=$(echo ${INITIAL_CREDENTIALS} | cut -c 63-)
+
+
+#403
+curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost/createItem
+
+#400
+curl --user admin:$ADMIN_PASSWORD -X POST -s -o /dev/null -w "%{http_code}" http://localhost/createItem
 
 # cleanup
 if [ ! "$TRAVIS" = true ] ; then
