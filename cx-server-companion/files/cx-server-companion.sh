@@ -7,7 +7,7 @@ readonly cxserver_companion_docker_image='ppiper/cx-server-companion'
 readonly container_port_http=8080
 readonly container_port_https=8443
 readonly network_name='cx-network'
-# cf https://gist.github.com/nmarley/0ee3e2cf14dabfb868eb818b8b30e7e0#gistcomment-2318045
+# Taken from https://gist.github.com/nmarley/0ee3e2cf14dabfb868eb818b8b30e7e0#gistcomment-2318045
 readonly cxserver_companion_container_id="$(awk -F/ '{ print $NF }' /proc/1/cpuset)"
 
 readonly cxserver_mount=/cx-server/mount
