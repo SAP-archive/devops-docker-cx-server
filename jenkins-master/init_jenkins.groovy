@@ -25,11 +25,8 @@ try {
     initExecutors()
     initLibraries()
 
-    // debug
-    System.getenv().each {
-        println(it)
-    }
-    println("instance.isUseSecurity() ${instance.isUseSecurity()}")
+    println("Value of `instance.isUseSecurity()`: ${instance.isUseSecurity()}")
+    println("Value of `System.getenv()['DEVELOPER_MODE']`: ${System.getenv()['DEVELOPER_MODE']}")
 
     if (System.getenv()['DEVELOPER_MODE']) {
         println("Running in developer mode, no security is enforced.")
@@ -44,15 +41,10 @@ catch(Throwable t) {
 def initAdminUser() {
     // cf https://github.com/jenkinsci/docker/issues/310
     instance.setSecurityRealm(new HudsonPrivateSecurityRealm(false))
-
-    //debug
-    instance.getSecurityRealm().getAllUsers().each {
-        println(it)
-    }
-
     String username = 'admin'
     String password = java.util.UUID.randomUUID()
     def user = instance.getSecurityRealm().createAccount(username, password)
+    // This println is API for the cx-server script and for the infra tests. Don't change.
     println(">>> Default credentials for Jenkins: Username ${username}, Password ${password}")
     user.save()
     def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
