@@ -7,6 +7,8 @@ import jenkins.plugins.git.GitSCMSource
 import org.jenkinsci.plugins.workflow.libs.*
 import java.net.URLDecoder
 import java.util.logging.Logger
+import hudson.security.*
+import jenkins.install.InstallState
 
 @Field
 Jenkins instance = Jenkins.instance
@@ -22,12 +24,33 @@ try {
     initProxy()
     initExecutors()
     initLibraries()
+
+    println("Value of `instance.isUseSecurity()`: ${instance.isUseSecurity()}")
+    println("Value of `System.getenv()['DEVELOPER_MODE']`: ${System.getenv()['DEVELOPER_MODE']}")
+
+    if (System.getenv()['DEVELOPER_MODE']) {
+        println("Running in developer mode, no security is enforced.")
+    } else if (!instance.isUseSecurity()) {
+        initAdminUser()
+    }
 }
 catch(Throwable t) {
     throw new Error("Failed to properly initialize Piper Jenkins. Please check the logs for more details.", t);
 }
 
-
+def initAdminUser() {
+    // cf https://github.com/jenkinsci/docker/issues/310
+    instance.setSecurityRealm(new HudsonPrivateSecurityRealm(false))
+    String username = 'admin'
+    String password = java.util.UUID.randomUUID()
+    def user = instance.getSecurityRealm().createAccount(username, password)
+    // This println is API for the cx-server script and for the infra tests. Don't change.
+    println(">>> Default credentials for Jenkins: Username ${username}, Password ${password}")
+    user.save()
+    def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
+    instance.setAuthorizationStrategy(strategy)
+    instance.save()
+}
 
 def initExecutors(){
     int numberOfExecutors = 6
@@ -43,7 +66,7 @@ def initLibraries(){
     String piperLibraryOsUrl = env.PIPER_LIBRARY_OS_URL ?: "https://github.com/SAP/jenkins-library.git"
     String piperLibraryOsBranch = env.PIPER_LIBRARY_OS_BRANCH ?: "master"
     createLibIfMissing("piper-lib-os", piperLibraryOsUrl, piperLibraryOsBranch)
-    
+
     String s4sdkLibraryUrl = env.S4SDK_LIBRARY_URL ?: "https://github.com/SAP/cloud-s4-sdk-pipeline-lib.git"
     String s4sdkLibraryBranch = env.S4SDK_LIBRARY_BRANCH ?: "master"
     createLibIfMissing("s4sdk-pipeline-library", s4sdkLibraryUrl, s4sdkLibraryBranch)
