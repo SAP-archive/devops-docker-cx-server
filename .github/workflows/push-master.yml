@@ -1,4 +1,4 @@
-name: Build images and push master commits or on schedule
+name: Build images and push (on master branch or on schedule)
 
 on:
   push:
@@ -13,4 +13,4 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Run CI
-      run: ./ci.sh latest  ${{ secrets.DOCKERHUB_PASSWORD }} ${{ secrets.DOCKERHUB_USER }}
+      run: ./ci.sh latest ${{ secrets.DOCKERHUB_PASSWORD }} ${{ secrets.DOCKERHUB_USER }}

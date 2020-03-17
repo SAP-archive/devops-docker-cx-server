@@ -1,4 +1,4 @@
-name: Release new Release (tagged version)
+name: Release new Release (manual release)
 
 on:
   release:

@@ -1,4 +1,4 @@
-name: Create new weekly Release
+name: Create new weekly Release (automated)
 
 on:
   schedule:
