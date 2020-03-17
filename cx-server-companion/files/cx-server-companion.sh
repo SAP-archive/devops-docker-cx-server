@@ -757,11 +757,20 @@ function restore_volume()
         exit 1
     fi
 
-    local backup_filename="${1}"
-    local backup_filepath="${backup_folder}/${backup_filename}"
+    local backup_filename
+    local backup_filepath
+
+    if [[ "${1}" != *"/"* ]]; then
+	backup_filename="${1}"
+	backup_filepath="${backup_folder}/${backup_filename}"
+
+    else
+        backup_filename="$(basename -- ${1})"
+        backup_filepath="$(realpath ${1})"
+    fi
 
     if [[ ! -r "${backup_filepath}" ]]; then
-        log_error "Backup file '${backup_filename}' can not be read or does not exist in backup folder."
+        log_error "Backup file '${backup_filename}' can not be read or does not exist in '${backup_filepath}'."
 
         exit 1
     fi
