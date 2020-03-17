@@ -111,7 +111,7 @@ This command creates a backup file and stores it on a host machine inside a dire
 
 ##### restore
 
-In an event of a server crash, the state of the Jenkins can be restored to a previously saved state if there is a backup file available. You need to execute the `restore` command along with the absolute path to the backup file that you want to restore the state to.
+In an event of a server crash, the state of the Jenkins can be restored to a previously saved state if there is a backup file available. You need to execute the `restore` command along with the name of the backup file that you want to restore the state to.
  
 Example:
 
