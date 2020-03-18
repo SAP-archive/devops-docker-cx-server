@@ -5,6 +5,9 @@ VERSION=$1
 DOCKERHUB_USER=$2
 DOCKERHUB_PASSWORD=$3
 
+echo ${DOCKERHUB_PASSWORD} | docker login -u ${DOCKERHUB_USER} --password-stdin
+
+
 if [[ ${VERSION} != latest ]] && [[ ${VERSION} != "v"* ]]; then
     echo "Error: Version must be 'latest' or 'v*'"
     exit 0
@@ -72,7 +75,6 @@ if [ -z ${DOCKERHUB_PASSWORD+x} ]; then
     exit 1
 fi
 
-echo ${DOCKERHUB_PASSWORD} | docker login -u ${DOCKERHUB_USER} --password-stdin
 push_image ppiper/jenkins-master
 push_image ppiper/jenkins-agent
 push_image ppiper/jenkins-agent-k8s
