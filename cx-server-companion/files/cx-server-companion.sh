@@ -517,6 +517,16 @@ function start_jenkins()
     else
         log_info "Cx Server is already running."
     fi
+
+    if [ -z ${DEVELOPER_MODE} ]; then
+        log_warn 'Please ensure your Jenkins instance is appropriatly secured, see: https://jenkins.io/doc/book/system-administration/security/
+A random password was created for admin, if your Jenkins instance was not secured already.
+Run "./cx-server initial-credentials" to find the default credentials.
+This might take a few minutes to complete.
+
+We recommend to change the default password immediately.'
+    fi
+
 }
 
 function start_jenkins_container()
@@ -640,6 +650,8 @@ function start_jenkins_container()
             environment_variable_parameters+=(-e $var)
         done
 
+        environment_variable_parameters+=(-e DEVELOPER_MODE)
+
         if [ ! -z "${cx_server_path}" ]; then
             if [ "${host_os}" = windows ] ; then
                 # transform windows path like "C:\abc\abc" to "//C/abc/abc"
@@ -734,6 +746,7 @@ function display_help()
     command_help_text 'restore'       "Restores the content of the configured 'jenkins_home' by the contents of the provided backup file. Usage: 'cx-server restore <name of the backup file>'."
     command_help_text 'update script' "Explicitly pull the Docker image containing this script to update to its latest version. Running this is not required, since the image is updated automatically."
     command_help_text 'update image'  "Updates the configured 'docker_image' to the newest available version of Cx Server image on Docker Hub."
+    command_help_text 'initial-credentials' "Shows initial admin credentials."
     command_help_text 'help'          "Shows this help text."
 }
 
@@ -1079,6 +1092,8 @@ elif [ "$1" == "help" ]; then
     warn_low_memory
 elif [ "$1" == "status" ]; then
     node /cx-server/status.js "{\"cache_enabled\": \"${cache_enabled}\"}"
+elif [ "$1" == "initial-credentials" ]; then
+    docker logs cx-jenkins-master 2>&1 | grep "Default credentials for Jenkins"
 else
     display_help "$1"
     warn_low_memory

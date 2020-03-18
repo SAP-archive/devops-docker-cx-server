@@ -9,7 +9,7 @@ When you make changes to `cx-server-companion/cx-server-companion.sh`, you need 
 From this directory (`jenkins-master/cx-server`), the command to do so is:
 
 ```bash
-docker build [--build-arg cx_server_base_uri=https://github.some.domain/raw/path/to/cx-server] -t ppiper/cx-server-companion ../../ppiper-cx-server-companion
+docker build [--build-arg cx_server_base_uri=https://github.some.domain/raw/path/to/cx-server] -t ppiper/cx-server-companion ../../cx-server-companion
 ```
 
 The build argument `cx_server_base_uri` is optional and only required if you don't want to use the `cx-server` version from GitHub.com.
