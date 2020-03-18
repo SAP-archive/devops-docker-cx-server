@@ -43,8 +43,7 @@ The `cx-server` can be customized to fit your use case. The `server.cfg` file co
   |`docker_registry` |  | Default docker registry used by the docker demon on the host machine |  Docker registry to be used to pull docker images from|
   |`jenkins_home`| X|`jenkins_home_volume`| The volume to be used as a `jenkins_home`. Please ensure, this volume is accessible by the user with id `1000` |
   |`http_port`| X (If `tls_enabled` is `false`) |`80`| The HTTP port on which the server listens for incoming connections.|
-  |`tls_enabled`| |`false`| Use Transport Layer Security encryption for additional security|
-  |`tls_certificate_directory`| X (If `tls_enabled` is `true`) | | Absolute path to the directory where the `jenkins.key` and `jenkins.crt` files exists|
+  |`tls_enabled`| |`false`| Use Transport Layer Security encryption for additional security. The `jenkins.key` and `jenkins.crt` files are expected in a directory named `tls` inside the `cx-server` directory.|
   |`https_port`| X (If `tls_enabled` is `true`)|`443`| The HTTPS port on which the server listens for incoming connections.|
   |`http_proxy`| | | Effective value of `http_proxy` environment variable wich is automatically passed on to all containers in the CI/CD setup. The Java proxy configuration of Jenkins and the download cache are automatically derived from this value. Proxy authentication is supported by the syntax `http://username:password@myproxy.corp:8080`. |
   |`https_proxy`| | | Same as `http_proxy` but for https URLs. Jenkins only supports one proxy URL. Therefore, if `https_proxy` and `http_proxy` are defined, the URL of `https_proxy` takes precedence for initializing the Jenkins proxy settings. |
@@ -197,7 +196,7 @@ cache_enabled=false
 The `cx-server` can be configured to use the TLS certificate for additional security. 
 In order to enable this, set the `tls_enabled` flag to true in the `server.cfg`. 
 It is also important to provide the certificates and a private key to `cx-server`.
-Set the `tls_certificate_directory` in the `server.cfg` to the directory where the certificate and private key(RSA) exists.
+Store the certificate and private key(RSA) files in the `cx-server` directory.
 [Here](self-signed-tls.md) you can find a guide to create your self-signed certificate. 
 Please note that currently the TLS encryption is not supported for the Windows environment.
 
@@ -205,7 +204,6 @@ Example:
 
 ```bash
 tls_enabled=true
-tls_certificate_directory="/var/tls/jenkins"
 https_port="443"
 ```
 
