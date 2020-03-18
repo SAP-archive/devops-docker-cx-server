@@ -1,0 +1,28 @@
+name: Create new weekly Release (automated)
+
+on:
+  schedule:
+    - cron:  '0 9 * * 1'
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Prepare Release
+        run: |
+          set -x
+          CURRENT_VERSION_LONG=$(curl --silent "https://api.github.com/repos/SAP/devops-docker-cx-server/releases/latest" | jq -r .tag_name)
+          CURRENT_VERSION=`echo $CURRENT_VERSION_LONG | cut -c 2-`
+          NEXT_VERSION=$(expr $CURRENT_VERSION + 1)
+          echo "::set-env name=PIPER_version::v$NEXT_VERSION"
+      - uses: SAP/project-piper-action@master
+        with:
+          piper-version: latest
+          command: githubPublishRelease
+          flags: --token ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build, test and push
+        run: |
+          echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
+          ./ci.sh ${PIPER_version}
