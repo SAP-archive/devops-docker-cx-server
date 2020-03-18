@@ -2,14 +2,13 @@
 
 readonly jenkins_container_name='cx-jenkins-master'
 readonly nexus_container_name='cx-nexus'
-readonly cache_docker_image='sonatype/nexus3:3.14.0'
+readonly cache_docker_image='sonatype/nexus3:3.21.1'
 readonly cxserver_companion_docker_image='ppiper/cx-server-companion'
 readonly container_port_http=8080
 readonly container_port_https=8443
 readonly network_name='cx-network'
-#Two times rev in combination with cut -f1 returns the last element of the cgroup which corresponds to the container id
-#Returns f323454ad3402f2513712 applied to 10:name=systemd:/docker/f323454ad3402f2513712
-readonly cxserver_companion_container_id="$(head -n 1 /proc/self/cgroup | rev | cut -d '/' -f1 | rev)"
+# Taken from https://gist.github.com/nmarley/0ee3e2cf14dabfb868eb818b8b30e7e0#gistcomment-2318045
+readonly cxserver_companion_container_id="$(awk -F/ '{ print $NF }' /proc/1/cpuset)"
 
 readonly cxserver_mount=/cx-server/mount
 readonly backup_folder="${cxserver_mount}/backup"
@@ -17,9 +16,19 @@ readonly tls_folder="${cxserver_mount}/tls"
 
 readonly alpine_docker_image='alpine:3.9'
 
+readonly tmp_dir='tmp'
 
 readonly bold_start="\033[1m"
 readonly bold_end="\033[0m"
+
+function die()
+{
+    local msg=$1; shift
+    local rc=${1:-1}; shift
+    [ -n "${msg}" ] && log_error "${msg}"
+    [ "${rc}" == "0" ] && log_warn "function \"die\" called with exit code \"${rc}\". This indicates a normal termination."
+    exit ${rc}
+}
 
 function log_error()
 {
@@ -137,7 +146,8 @@ function retry()
 
 function trace_execution()
 {
-    echo -e "\033[1m>>\033[0m" $*
+    echo -e -n "\033[1m>>\033[0m " >&2
+    echo $* >&2
 }
 
 function run()
@@ -260,10 +270,24 @@ function stop_jenkins_container()
         user_and_pass=(-u "${user_name}:${password}")
     fi
 
+    if [ ! -e "${tmp_dir}" ]; then
+        mkdir -p "${tmp_dir}" ||die "Cannot create tmp dir \"${tmp_dir}\"." 1
+    fi
+
+    cookies_file="${tmp_dir}/cookies-$(date +%s).jar"
+
     echo ""
     echo "Initiating safe shutdown..."
 
-    exitCmd=(docker exec ${jenkins_container_name} curl --noproxy localhost --write-out '%{http_code}' --output /dev/null --silent "${user_and_pass[@]}" -X POST "http://localhost:${container_port_http}/safeExit")
+    crumb_header_snippet=`get_crumb_header_snippet "${jenkins_container_name}" "${container_port_http}" "${cookies_file}" "${user_and_pass[@]}"`
+    [ "$?" != 0 ] && die "Cannot retrieve XSRF crumb. Check log for details" 1
+
+    cookie_file_snippet=""
+    if [ ! -z "${crumb_header_snippet}" ]; then
+        cookie_file_snippet="--cookie ${cookies_file}"
+    fi
+
+    exitCmd=(docker exec ${jenkins_container_name} curl --noproxy localhost --write-out '%{http_code}' --output /dev/null --silent "${user_and_pass[@]}" ${cookie_file_snippet} ${crumb_header_snippet} -X POST "http://localhost:${container_port_http}/safeExit")
 
     if [ ! -z "${password}" ]; then
         trace_execution "${exitCmd[@]//${password}/******}"
@@ -298,6 +322,8 @@ function stop_jenkins_container()
             exit 1
         fi
     done
+
+    rm -rf "${cookies_file}"
 
     echo -n "Waiting for running jobs to finish..."
     retry 360 5 0 "is_container_status ${jenkins_container_name} 'exited'"
@@ -438,6 +464,8 @@ function start_nexus_container()
         environment_variable_parameters+=($(get_proxy_parameters "${cache_docker_image}"))
         IFS=${old_IFS}
 
+        environment_variable_parameters+=(-e NEXUS_SECURITY_RANDOMPASSWORD=false)
+
         print_nexus_config
 
         local nexus_port_mapping=()
@@ -489,6 +517,16 @@ function start_jenkins()
     else
         log_info "Cx Server is already running."
     fi
+
+    if [ -z ${DEVELOPER_MODE} ]; then
+        log_warn 'Please ensure your Jenkins instance is appropriatly secured, see: https://jenkins.io/doc/book/system-administration/security/
+A random password was created for admin, if your Jenkins instance was not secured already.
+Run "./cx-server initial-credentials" to find the default credentials.
+This might take a few minutes to complete.
+
+We recommend to change the default password immediately.'
+    fi
+
 }
 
 function start_jenkins_container()
@@ -612,6 +650,8 @@ function start_jenkins_container()
             environment_variable_parameters+=(-e $var)
         done
 
+        environment_variable_parameters+=(-e DEVELOPER_MODE)
+
         if [ ! -z "${cx_server_path}" ]; then
             if [ "${host_os}" = windows ] ; then
                 # transform windows path like "C:\abc\abc" to "//C/abc/abc"
@@ -706,6 +746,7 @@ function display_help()
     command_help_text 'restore'       "Restores the content of the configured 'jenkins_home' by the contents of the provided backup file. Usage: 'cx-server restore <name of the backup file>'."
     command_help_text 'update script' "Explicitly pull the Docker image containing this script to update to its latest version. Running this is not required, since the image is updated automatically."
     command_help_text 'update image'  "Updates the configured 'docker_image' to the newest available version of Cx Server image on Docker Hub."
+    command_help_text 'initial-credentials' "Shows initial admin credentials."
     command_help_text 'help'          "Shows this help text."
 }
 
@@ -716,11 +757,20 @@ function restore_volume()
         exit 1
     fi
 
-    local backup_filename="${1}"
-    local backup_filepath="${backup_folder}/${backup_filename}"
+    local backup_filename
+    local backup_filepath
+
+    if [[ "${1}" != *"/"* ]]; then
+	backup_filename="${1}"
+	backup_filepath="${backup_folder}/${backup_filename}"
+
+    else
+        backup_filename="$(basename -- ${1})"
+        backup_filepath="$(realpath ${1})"
+    fi
 
     if [[ ! -r "${backup_filepath}" ]]; then
-        log_error "Backup file '${backup_filename}' can not be read or does not exist in backup folder."
+        log_error "Backup file '${backup_filename}' can not be read or does not exist in '${backup_filepath}'."
 
         exit 1
     fi
@@ -948,6 +998,48 @@ function get_port_mapping(){
     return_value=$mapping
 }
 
+# Returns a valid header snippet containing the crumb. In case XSRF protection is disabled the empty string is returned.
+function get_crumb_header_snippet {
+
+    local JENKINS_CONTAINER_NAME=$1; shift
+    local PORT=$1; shift
+    local COOKIES_JAR=$1; shift
+    local USER_SNIPPET=$@;
+
+    CRUMB_CMD=(docker exec ${JENKINS_CONTAINER_NAME} curl -w "\nHTTP_CODE:%{http_code}\n" ${USER_SNIPPET} --cookie-jar "${COOKIES_JAR}" --noproxy localhost http://localhost:${PORT}/crumbIssuer/api/xml?xpath=concat\(//crumbRequestField,%22:%22,//crumb\))
+
+    if [ ! -z "${password}" ]; then
+        trace_execution "${CRUMB_CMD[@]//${password}/******}"
+    else
+        trace_execution "${CRUMB_CMD[@]}"
+    fi
+
+    local CRUMB_RESPONSE=$("${CRUMB_CMD[@]}" 2>/dev/null)
+
+    local HTTP_CODE=$(echo "${CRUMB_RESPONSE}" |grep HTTP_CODE |sed 's/HTTP_CODE://g')
+    local CRUMB_SNIPPET=""
+
+    case "${HTTP_CODE}" in
+        200)
+            CRUMB=$(echo "${CRUMB_RESPONSE}" |grep -v HTTP_CODE)
+            log_info "XSRF-Protection enabled"
+            CRUMB_SNIPPET="-H ${CRUMB}"
+            ;;
+        401)
+            die "Cannot get XSRF crumb. Unauthorized." 7
+            ;;
+        404)
+            log_info "XSRF-Protection not enabled"
+            ;;
+        *)
+            log_warn "Response from retrieving crumb: \"${CRUMB_RESPONSE}\""
+            die "Unexpected response code while retrieving crumb: \"${HTTP_CODE}\"" 8
+            ;;
+    esac
+
+    echo "${CRUMB_SNIPPET}"
+}
+
 ### Start of Script
 read_configuration
 
@@ -1000,6 +1092,8 @@ elif [ "$1" == "help" ]; then
     warn_low_memory
 elif [ "$1" == "status" ]; then
     node /cx-server/status.js "{\"cache_enabled\": \"${cache_enabled}\"}"
+elif [ "$1" == "initial-credentials" ]; then
+    docker logs cx-jenkins-master 2>&1 | grep "Default credentials for Jenkins"
 else
     display_help "$1"
     warn_low_memory
