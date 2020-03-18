@@ -1093,7 +1093,13 @@ elif [ "$1" == "help" ]; then
 elif [ "$1" == "status" ]; then
     node /cx-server/status.js "{\"cache_enabled\": \"${cache_enabled}\"}"
 elif [ "$1" == "initial-credentials" ]; then
-    docker logs cx-jenkins-master 2>&1 | grep "Default credentials for Jenkins"
+    if docker logs cx-jenkins-master 2>&1 | grep "Default credentials for Jenkins" ; then
+            log_info "Note that this command only shows the default credentials.
+Please change the password for admin as soon as you can.
+Go to http://localhost/user/admin/configure (you might need to replace localhost with the IP or hostname) to change admin's password.";
+    else
+            log_info "Could not get initial credentials. It might take a few minutes to get them, or your Jenkins instance might not be secured.";
+    fi
 else
     display_help "$1"
     warn_low_memory

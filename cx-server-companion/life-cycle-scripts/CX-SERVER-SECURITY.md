@@ -6,6 +6,8 @@ Some recommendations:
 
 Jenkins has a default password for the `admin` account set.
 You can get it by running `./cx-server initial-credentials` once your Jenkins is up and running.
+Please change it as soon as you can to a secure password.
+Go to http://localhost/user/admin/configure (you might need to replace localhost with the IP or hostname) to do that.
 
 The `latest` tag of the CX Server Docker images are rebuilt on a regular basis.
 To benefit from updated Jenkins core and plugin versions, you should stop, remove, and restart your CX Server instance on a regular basis.
