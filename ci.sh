@@ -11,17 +11,14 @@ VERSION=$1
 
 if [[ ${VERSION} != latest ]] && [[ ${VERSION} != "v"* ]]; then
     echo "Error: Version must be 'latest' or 'v*'"
-    exit 0
+    exit 1
 fi
-
-echo Docker Registry info
-docker system info | grep -E 'Username|Registry'
 
 build_image() {
     local TAG=$1
     local DIR=$2
 
-    if [ "x${VERSION}" = xlatest ]; then
+    if [ "${VERSION}" = latest ]; then
         # Create a backup of the image to allow rollback in case of failure
         docker pull "${TAG}":latest
         docker tag "${TAG}":latest "${TAG}":backup-of-latest
@@ -41,8 +38,6 @@ smoke_test() {
     # Check for 'SEVERE' messages in Jenkins log (usually caused by a plugin or configuration issues)
     # Note: This will exit with code 1 if a finding of SEVERE exists
     docker logs cx-jenkins-master-test 2> >(grep --quiet SEVERE)
-    # Print plugin config
-    docker exec cx-jenkins-master-test bash -c "curl http://localhost:8080/pluginManager/api/xml?depth=1"
 }
 
 push_image() {
@@ -50,7 +45,7 @@ push_image() {
 
     docker tag "${TAG}":"${VERSION}"-RC "${TAG}":"${VERSION}"
 
-    if [ "x${VERSION}" = xlatest ]; then
+    if [ "${VERSION}" = latest ]; then
         docker push "${TAG}":backup-of-latest
     fi
 
