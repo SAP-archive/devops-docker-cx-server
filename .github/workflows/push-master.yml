@@ -13,4 +13,6 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Run CI
-      run: ./ci.sh latest ${{ secrets.DOCKERHUB_PASSWORD }} ${{ secrets.DOCKERHUB_USER }}
+      run: |
+        echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
+        ./ci.sh latest

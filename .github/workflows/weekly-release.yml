@@ -23,4 +23,6 @@ jobs:
           flags: --token ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build, test and push
-        run: ./ci.sh ${PIPER_version} ${{ secrets.DOCKERHUB_PASSWORD }} ${{ secrets.DOCKERHUB_USER }}
+        run: |
+          echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
+          ./ci.sh ${PIPER_version}
