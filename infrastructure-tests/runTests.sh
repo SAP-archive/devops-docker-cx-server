@@ -37,14 +37,18 @@ docker run -v //var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workspace \
 # Test Jenkins default admin credentials
 INITIAL_CREDENTIALS=$(docker logs cx-jenkins-master 2>&1 | grep "Default credentials for Jenkins")
 ADMIN_PASSWORD=$(echo ${INITIAL_CREDENTIALS} | cut -c 63-)
+# File where web session cookie is saved
+COOKIEJAR="$(mktemp)"
+CRUMB=$(curl -u "admin:$ADMIN_PASSWORD" --cookie-jar "$COOKIEJAR" "http://localhost/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)")
+
 # Expect code 403 Forbidden because we are not authorized
-ACTUAL_STATUS_CODE_WITHOUT_AUTH=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost/createItem)
+ACTUAL_STATUS_CODE_WITHOUT_AUTH=$(curl -s -o /dev/null --cookie "$COOKIEJAR" -H "$CRUMB" -w "%{http_code}" -X POST http://localhost/createItem)
 if [ "$ACTUAL_STATUS_CODE_WITHOUT_AUTH" != "403" ]; then
     echo Expected status 403, but got $ACTUAL_STATUS_CODE_WITHOUT_AUTH
     exit 122
 fi
 # Expect code 400 Bad Request because we are authorized but don't pass the required parameters
-ACTUAL_STATUS_CODE_WITH_AUTH=$(curl --user admin:$ADMIN_PASSWORD -X POST -s -o /dev/null -w "%{http_code}" http://localhost/createItem)
+ACTUAL_STATUS_CODE_WITH_AUTH=$(curl --user admin:$ADMIN_PASSWORD -X POST -s -o /dev/null --cookie "$COOKIEJAR" -H "$CRUMB" -w "%{http_code}" http://localhost/createItem)
 if [ "$ACTUAL_STATUS_CODE_WITH_AUTH" != "400" ]; then
     echo Expected status 400, but got $ACTUAL_STATUS_CODE_WITH_AUTH
     exit 123
