@@ -69,6 +69,11 @@ You can start the Jenkins server by launching the `start` command.
 When launched, it checks if the Docker container named `cx-jenkins-master` already exists.
 If yes, it restarts the stopped container. Otherwise, it spawns a new Docker container based on the configuration in `server.cfg`.
 
+Please make sure to secure your Jenkins after starting.
+By default Jenkins already comes with a default user admin.
+You can get the initial password by running the command `./cx-server initial-credentials`.
+Further details can be found [here](../../cx-server-companion/life-cycle-scripts/CX-SERVER-SECURITY.md).
+
 ##### status
 
 The status command provides basic overview about your Cx Server instance.
