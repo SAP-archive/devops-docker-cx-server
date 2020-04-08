@@ -465,6 +465,7 @@ function start_nexus_container()
         IFS=${old_IFS}
 
         environment_variable_parameters+=(-e NEXUS_SECURITY_RANDOMPASSWORD=false)
+        environment_variable_parameters+=(-e NEXUS_SCRIPTS_ALLOWCREATION=true)
 
         print_nexus_config
 
