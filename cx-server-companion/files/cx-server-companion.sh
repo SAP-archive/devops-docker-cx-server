@@ -2,7 +2,7 @@
 
 readonly jenkins_container_name='cx-jenkins-master'
 readonly nexus_container_name='cx-nexus'
-readonly cache_docker_image='sonatype/nexus3:3.21.1'
+readonly cache_docker_image='sonatype/nexus3:3.22.0'
 readonly cxserver_companion_docker_image='ppiper/cx-server-companion'
 readonly container_port_http=8080
 readonly container_port_https=8443
