@@ -38,6 +38,7 @@ pipeline-stage-step
 pipeline-utility-steps
 pmd
 rebuild
+role-strategy
 saferestart
 sonar
 ssh-agent
