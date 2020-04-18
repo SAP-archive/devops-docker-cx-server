@@ -2,7 +2,7 @@
 
 Dockerfile for running the [Project "Piper" Action](https://github.com/SAP/project-piper-action) locally using [act](https://github.com/nektos/act)
 
-**NOTE:** This is a Proof of Concept, depending on what your GitHub Actions workflow does, the image will be not work.
+**NOTE:** This is a Proof of Concept, depending on what your GitHub Actions workflow does, the image will not work out of the box.
 The image tries to mirror [GitHub's hosted runner image](https://github.com/actions/virtual-environments/blob/master/images/linux/Ubuntu1804-README.md) to a very limited scope.
 The goal is to provide an environment capable of running workflows based on project "Piper", not more.
 It contains a user called `actions` with uid `1000`.
