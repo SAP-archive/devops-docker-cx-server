@@ -56,6 +56,7 @@ build_image ppiper/jenkins-master jenkins-master
 build_image ppiper/jenkins-agent jenkins-agent
 build_image ppiper/jenkins-agent-k8s jenkins-agent-k8s
 build_image ppiper/cx-server-companion cx-server-companion
+build_image ppiper/action-runtime project-piper-action-runtime
 
 smoke_test
 
@@ -68,3 +69,4 @@ push_image ppiper/jenkins-master
 push_image ppiper/jenkins-agent
 push_image ppiper/jenkins-agent-k8s
 push_image ppiper/cx-server-companion
+build_image ppiper/action-runtime
