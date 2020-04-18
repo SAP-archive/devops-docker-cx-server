@@ -23,7 +23,10 @@ ARG NODE_VERSION
 
 ENV PATH=/opt/apache-maven-$MAVEN_VERSION/bin:/opt/node-$NODE_VERSION-linux-x64/bin:/opt/sapmachine-jdk-$JVM_VERSION/bin:$PATH
 
-RUN apt-get -y update; apt-get -y dist-upgrade; apt-get -y install wget curl unzip
+# hadolint ignore=DL3008,DL3015
+RUN apt-get -y update; apt-get -y dist-upgrade; apt-get -y install wget curl unzip \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /opt /opt
 RUN mkdir -p /home/actions && echo "actions:x:1000:1000:actions:/home/actions:/bin/bash" >> /etc/passwd
 RUN chown -R actions /home/actions
