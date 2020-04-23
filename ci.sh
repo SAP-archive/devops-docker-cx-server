@@ -69,4 +69,4 @@ push_image ppiper/jenkins-master
 push_image ppiper/jenkins-agent
 push_image ppiper/jenkins-agent-k8s
 push_image ppiper/cx-server-companion
-build_image ppiper/action-runtime
+push_image ppiper/action-runtime
