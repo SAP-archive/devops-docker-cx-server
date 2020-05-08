@@ -1,5 +1,6 @@
 analysis-collector
 ansicolor
+authorize-project
 badge
 blueocean
 build-monitor-plugin
