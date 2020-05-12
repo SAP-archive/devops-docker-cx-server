@@ -21,6 +21,7 @@ EOF
     chmod +x .pipeline/01_prepareVersion.sh
 fi
 
+
 if [ ! -f .pipeline/02_build.sh ]; then
     cat << EOF > .pipeline/02_build.sh
 #!/usr/bin/env bash
@@ -32,6 +33,7 @@ EOF
     chmod +x .pipeline/02_build.sh
 fi
 
+
 if [ ! -f .pipeline/04_staticChecks.sh ]; then
     cat << EOF > .pipeline/04_staticChecks.sh
 #!/usr/bin/env bash
@@ -41,5 +43,24 @@ set -ex
 piper mavenExecuteStaticCodeChecks
 EOF
     chmod +x .pipeline/04_staticChecks.sh
+fi
+
+if [ ! -f .pipeline/ci.sh ]; then
+    cat << EOF > .pipeline/ci.sh
+#!/usr/bin/env bash
+
+set -ex
+
+# Pipeline script for running locally as an alternative to act
+
+
+. .pipeline/01_prepareVersion.sh
+
+. .pipeline/02_build.sh
+
+. .pipeline/04_staticChecks.sh
+
+EOF
+    chmod +x .pipeline/ci.sh
 fi
 
