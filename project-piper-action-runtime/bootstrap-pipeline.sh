@@ -34,6 +34,19 @@ EOF
 fi
 
 
+if [ ! -f .pipeline/03_tests.sh ]; then
+    cat << EOF > .pipeline/03_tests.sh
+#!/usr/bin/env bash
+
+set -ex
+
+piper mavenExecute --goals=verify
+
+EOF
+    chmod +x .pipeline/03_tests.sh
+fi
+
+
 if [ ! -f .pipeline/04_staticChecks.sh ]; then
     cat << EOF > .pipeline/04_staticChecks.sh
 #!/usr/bin/env bash
