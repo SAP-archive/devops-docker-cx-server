@@ -6,27 +6,29 @@ import com.sap.piper.testutils.JenkinsController
 timeout(time: 5, unit: 'HOURS') {
 
     node("master") {
-        stage('Init') {
-            deleteDir()
-            checkout scm
-            if (!env.HOST) {
-                error "Violated assumption: Environment variable env.HOST is not set. This must be set as the hostname."
+        withEnv(['DOCKER_API_VERSION=1.38']) {
+            stage('Init') {
+                deleteDir()
+                checkout scm
+                if (!env.HOST) {
+                    error "Violated assumption: Environment variable env.HOST is not set. This must be set as the hostname."
+                }
             }
-        }
 
-        JenkinsController jenkins
+            JenkinsController jenkins
 
-        stage('Start Jenkins') {
-            jenkins = new JenkinsController(this, "http://${env.HOST}")
-            jenkins.waitForJenkinsStarted()
-        }
+            stage('Start Jenkins') {
+                jenkins = new JenkinsController(this, "http://${env.HOST}")
+                jenkins.waitForJenkinsStarted()
+            }
 
-        stage('Trigger Job') {
-            jenkins.buildJob('validation-job')
-        }
+            stage('Trigger Job') {
+                jenkins.buildJob('validation-job')
+            }
 
-        stage('Wait for successful build') {
-            jenkins.waitForSuccess('validation-job', 'validate-cx-server')
+            stage('Wait for successful build') {
+                jenkins.waitForSuccess('validation-job', 'validate-cx-server')
+            }
         }
     }
 }
