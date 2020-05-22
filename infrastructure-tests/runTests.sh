@@ -1,8 +1,8 @@
 #!/bin/bash -ex
 
 # Update docker to avoid api-version issues due to outdated version
-sudo apt-get -y update
-sudo apt-get -y install \
+sudo apt-get -yq update
+sudo apt-get -yq install \
     apt-transport-https \
     ca-certificates \
     curl \
@@ -13,7 +13,7 @@ sudo add-apt-repository \
    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
    $(lsb_release -cs) \
    stable"
-sudo apt-get -y update
+sudo apt-get -yq update
 sudo apt-get -y install docker-ce docker-ce-cli containerd.io
 docker version
 
