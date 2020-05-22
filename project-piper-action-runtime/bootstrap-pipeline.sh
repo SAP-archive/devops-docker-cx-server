@@ -10,20 +10,22 @@ echo "##vso[task.setvariable variable=PATH]${PATH}:${PWD}/bin"
 
 mkdir -p .pipeline
 
-if [ ! -f .pipeline/ci.sh ]; then
-    cat << EOF > .pipeline/ci.sh
+cat << EOF > .pipeline/ci.sh
 #!/usr/bin/env bash
 
 set -ex
 
+prepare_build() {
+    piper artifactPrepareVersion
+}
 build() {
-    echo piper build
+    piper mavenBuild
 }
 test() {
     echo piper test
 }
 check() {
-    echo piper check
+    piper mavenExecuteStaticCodeChecks
 }
 security() {
     echo piper security
@@ -40,16 +42,16 @@ if [ -f .pipeline/ci_extensions.sh ]; then
 fi
 
 case \$1 in
-    build) echo build;;
-    test) echo test;;
-    check) echo check;;
-    security) echo security;;
-    deploy_artifact) echo deploy_artifact;;
-    deliver) echo deliver;;
-    *) echo foobar;;
+    prepare_build) prepare_build;;
+    build) build;;
+    test) test;;
+    check) check;;
+    security) security;;
+    deploy_artifact) deploy_artifact;;
+    deliver) deliver;;
+    *) echo Invalid command \$1;;
 esac
 
-
 EOF
-    chmod +x .pipeline/ci.sh
-fi
+
+chmod +x .pipeline/ci.sh
