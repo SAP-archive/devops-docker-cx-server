@@ -37,3 +37,5 @@ ENV PATH=/opt/apache-maven-$MAVEN_VERSION/bin:/opt/node-$NODE_VERSION-linux-x64/
 ENV RUNNER_TEMP=/tmp
 
 COPY --from=builder /opt /opt
+COPY bootstrap-pipeline.sh /opt
+RUN chmod +x /opt/bootstrap-pipeline.sh

@@ -1,0 +1,17 @@
+name: Build feature branch of runtime image (just for experiments)
+
+on:
+  push:
+    branches:
+      - Bootstrap-script-for-pipeline
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Run CI
+      run: |
+        echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
+        docker build project-piper-action-runtime -t ppiper/action-runtime:Bootstrap-script-for-pipeline
+        docker push ppiper/action-runtime:Bootstrap-script-for-pipeline
