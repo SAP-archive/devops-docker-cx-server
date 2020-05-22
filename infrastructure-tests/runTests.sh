@@ -1,5 +1,10 @@
 #!/bin/bash -ex
 
+# Update docker to avoid api-version issues due to outdated version
+sudo apt update -y
+sudo apt install --only-upgrade docker-ce -y
+docker info
+
 # Start a local registry, to which we push the images built in this test, and from which they will be consumed in the test
 docker run -d -p 5000:5000 --restart always --name registry registry:2 || true
 find ../cx-server-companion -type f -exec sed -i -e 's/ppiper/localhost:5000\/ppiper/g' {} \;
