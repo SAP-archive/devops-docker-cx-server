@@ -22,11 +22,9 @@ ARG MAVEN_VERSION
 ARG NODE_VERSION
 
 # hadolint ignore=DL3008
-RUN wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb \
- && dpkg -i packages-microsoft-prod.deb \
- && apt-get -y update \
+RUN apt-get -y update \
  && apt-get -y dist-upgrade \
- && apt-get -y --no-install-recommends install wget curl ca-certificates unzip powershell \
+ && apt-get -y --no-install-recommends install wget curl ca-certificates unzip \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/* \
  && mkdir -p /home/actions && echo "actions:x:1000:1000:actions:/home/actions:/bin/bash" >> /etc/passwd \
@@ -41,5 +39,3 @@ ENV RUNNER_TEMP=/tmp
 COPY --from=builder /opt /opt
 COPY bootstrap-pipeline.sh /opt
 RUN chmod +x /opt/bootstrap-pipeline.sh
-COPY bootstrap-pipeline.ps1 /opt
-RUN chmod +x /opt/bootstrap-pipeline.ps1
