@@ -37,5 +37,11 @@ ENV PATH=/opt/apache-maven-$MAVEN_VERSION/bin:/opt/node-$NODE_VERSION-linux-x64/
 ENV RUNNER_TEMP=/tmp
 
 COPY --from=builder /opt /opt
+ADD https://github.com/SAP/jenkins-library/releases/latest/download/piper /opt/piper
+RUN chmod +x /opt/piper
+RUN npm install -g typescript; npm i @types/node
+COPY pipe.ts /opt
+
 COPY bootstrap-pipeline.sh /opt
 RUN chmod +x /opt/bootstrap-pipeline.sh
+
