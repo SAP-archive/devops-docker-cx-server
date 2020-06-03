@@ -71,6 +71,9 @@ if [ "$ACTUAL_STATUS_CODE_WITH_AUTH" != "400" ]; then
     exit 123
 fi
 
+JENKINS_USERNAME=admin JENKINS_PASSWORD=$ADMIN_PASSWORD ./cx-server stop
+./cx-server remove
+
 # cleanup
 if [ ! "$TRAVIS" = true ] ; then
     rm -f cx-server server.cfg custom-environment.list

@@ -260,14 +260,19 @@ function stop_jenkins()
 
 function stop_jenkins_container()
 {
-    echo -n "Jenkins username (leave empty for unprotected server): "
-    read -r user_name
-
     user_and_pass=()
-    if [ ! -z "${user_name}" ]; then
-        echo -n "Password for ${user_name}: "
-        read -r -s password
-        user_and_pass=(-u "${user_name}:${password}")
+
+    if [[ -n "${JENKINS_USERNAME}" && -n "${JENKINS_PASSWORD}" ]]; then
+        user_and_pass=(-u "${JENKINS_USERNAME}:${JENKINS_PASSWORD}")
+    else
+        echo -n "Jenkins username (leave empty for unprotected server): "
+        read -r user_name
+
+        if [ ! -z "${user_name}" ]; then
+            echo -n "Password for ${user_name}: "
+            read -r -s password
+            user_and_pass=(-u "${user_name}:${password}")
+        fi
     fi
 
     if [ ! -e "${tmp_dir}" ]; then
