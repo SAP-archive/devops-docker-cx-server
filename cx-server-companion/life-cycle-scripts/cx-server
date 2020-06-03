@@ -14,6 +14,8 @@ docker_arguments=(--rm
     --workdir /cx-server/mount
     --volume /var/run/docker.sock:/var/run/docker.sock
     --env DEVELOPER_MODE
+    --env JENKINS_USERNAME
+    --env JENKINS_PASSWORD
     --env "host_os=unix"
     --env "cx_server_path=${PWD}")
 
