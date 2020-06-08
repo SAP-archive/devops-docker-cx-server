@@ -24,13 +24,14 @@ jobs:
             exit 1
           fi
           echo "::set-env name=PIPER_version::$NEXT_VERSION"
-      - uses: SAP/project-piper-action@master
-        with:
-          piper-version: latest
-          command: githubPublishRelease
-          flags: --token ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build, test and push
         run: |
           echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
           ./ci.sh ${PIPER_version}
+
+      - uses: SAP/project-piper-action@master
+        with:
+          piper-version: latest
+          command: githubPublishRelease
+          flags: --token ${{ secrets.GITHUB_TOKEN }}

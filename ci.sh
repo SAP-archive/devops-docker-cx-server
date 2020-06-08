@@ -52,21 +52,38 @@ push_image() {
     docker push "${TAG}":"${VERSION}"
 }
 
+echo '::group::Pull Base Images'
+docker pull jenkins/jenkins:lts-slim
+docker pull node:11-alpine
+docker pull openjdk:8-jre-slim
+docker pull jenkins/jnlp-slave:3.27-1-alpine
+docker pull debian:buster-slim
+echo '::endgroup'
+
+echo '::group::Build Jenkins Master Image'
 build_image ppiper/jenkins-master jenkins-master
+echo '::endgroup'
+
+echo '::group::Build other Images'
 build_image ppiper/jenkins-agent jenkins-agent
 build_image ppiper/jenkins-agent-k8s jenkins-agent-k8s
 build_image ppiper/cx-server-companion cx-server-companion
 build_image ppiper/action-runtime project-piper-action-runtime
+echo '::endgroup'
 
+echo '::group::Smoketest'
 smoke_test
+echo '::endgroup'
 
 if [[ ${GITHUB_REF##*/} != master ]] && [[ ${GITHUB_REF##*/} != "v"* ]]; then
     echo "Not pushing on ref ${GITHUB_REF}"
     exit 0
 fi
 
+echo '::group::Push Images'
 push_image ppiper/jenkins-master
 push_image ppiper/jenkins-agent
 push_image ppiper/jenkins-agent-k8s
 push_image ppiper/cx-server-companion
 push_image ppiper/action-runtime
+echo '::endgroup'
