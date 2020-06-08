@@ -52,6 +52,14 @@ push_image() {
     docker push "${TAG}":"${VERSION}"
 }
 
+echo '::group::Pull Base Images'
+docker pull jenkins/jenkins:lts-slim
+docker pull node:11-alpine
+docker pull openjdk:8-jre-slim
+docker pull jenkins/jnlp-slave:3.27-1-alpine
+docker pull debian:buster-slim
+echo '::endgroup'
+
 echo '::group::Build Jenkins Master Image'
 build_image ppiper/jenkins-master jenkins-master
 echo '::endgroup'
