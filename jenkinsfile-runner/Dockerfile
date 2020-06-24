@@ -7,9 +7,9 @@ ENV JENKINSFILE_RUNNER_VERSION 1.0-beta-12
 # User needs to be root for access to mounted Docker socket
 # hadolint ignore=DL3002
 USER root
-RUN curl -O https://repo.jenkins-ci.org/releases/io/jenkins/jenkinsfile-runner/jenkinsfile-runner/$JENKINSFILE_RUNNER_VERSION/jenkinsfile-runner-$JENKINSFILE_RUNNER_VERSION-app.zip && \
-    unzip jenkinsfile-runner-$JENKINSFILE_RUNNER_VERSION-app.zip -d jenkinsfile-runner && \
-    rm jenkinsfile-runner-$JENKINSFILE_RUNNER_VERSION-app.zip && \
+RUN curl -O https://repo.jenkins-ci.org/releases/io/jenkins/jenkinsfile-runner/jenkinsfile-runner/$JENKINSFILE_RUNNER_VERSION/jenkinsfile-runner-$JENKINSFILE_RUNNER_VERSION.zip && \
+    unzip jenkinsfile-runner-$JENKINSFILE_RUNNER_VERSION.zip -d jenkinsfile-runner && \
+    rm jenkinsfile-runner-$JENKINSFILE_RUNNER_VERSION.zip && \
     chmod +x /jenkinsfile-runner/bin/jenkinsfile-runner
 
 RUN mkdir /jenkins-war && unzip /usr/share/jenkins/jenkins.war -d /jenkins-war && \

@@ -69,6 +69,7 @@ build_image ppiper/jenkins-agent jenkins-agent
 build_image ppiper/jenkins-agent-k8s jenkins-agent-k8s
 build_image ppiper/cx-server-companion cx-server-companion
 build_image ppiper/action-runtime project-piper-action-runtime
+build_image ppiper/jenkinsfile-runner jenkinsfile-runner
 echo '::endgroup'
 
 echo '::group::Smoketest'
