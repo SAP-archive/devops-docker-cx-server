@@ -75,6 +75,11 @@ echo '::endgroup'
 echo '::group::Smoketest'
 smoke_test
 echo '::endgroup'
+echo '::group::Smoketest JFR'
+pushd jenkinsfile-runner
+docker run -v $(pwd):/workspace ppiper/jenkinsfile-runner
+popd
+echo '::endgroup'
 
 if [[ ${GITHUB_REF##*/} != master ]] && [[ ${GITHUB_REF##*/} != "v"* ]]; then
     echo "Not pushing on ref ${GITHUB_REF}"
