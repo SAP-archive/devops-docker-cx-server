@@ -244,7 +244,7 @@ function get_proxy_parameters()
 function wait_for_started()
 {
     echo -n "Waiting for the Cx server to start"
-    wait_for_successful_start 120 "${jenkins_container_name}" curl --noproxy localhost --silent "http://localhost:${container_port_http}/api/json"
+    wait_for_successful_start 180 "${jenkins_container_name}" curl --noproxy localhost --silent "http://localhost:${container_port_http}/api/json"
 }
 
 function stop_jenkins()
@@ -307,7 +307,7 @@ function stop_jenkins_container()
     fi
 
     echo -n "Waiting for Cx server to accept safeExit signal..."
-    local attempts=120
+    local attempts=180
     local i
     for ((i=0; i < attempts; i++)); do
         echo -n "."
@@ -492,7 +492,7 @@ function start_nexus_container()
 function wait_for_nexus_started()
 {
     echo -n "Waiting for the nexus server to start"
-    wait_for_successful_start 120 "${nexus_container_name}" curl --noproxy localhost --silent -X GET http://localhost:8081/service/rest/v1/script --header 'Authorization: Basic YWRtaW46YWRtaW4xMjM=' --header 'Content-Type: application/json'
+    wait_for_successful_start 180 "${nexus_container_name}" curl --noproxy localhost --silent -X GET http://localhost:8081/service/rest/v1/script --header 'Authorization: Basic YWRtaW46YWRtaW4xMjM=' --header 'Content-Type: application/json'
 }
 
 function init_nexus()
