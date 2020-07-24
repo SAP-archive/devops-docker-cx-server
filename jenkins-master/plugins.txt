@@ -2,6 +2,7 @@ analysis-collector
 ansicolor
 authorize-project
 badge
+blackduck-detect
 blueocean
 build-monitor-plugin
 build-timeout
