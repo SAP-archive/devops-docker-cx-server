@@ -2,6 +2,7 @@ analysis-collector
 ansicolor
 authorize-project
 badge
+blackduck-detect
 blueocean
 build-monitor-plugin
 build-timeout
@@ -42,7 +43,6 @@ role-strategy
 saferestart
 sonar
 ssh-agent
-synopsys-detect-plugin 
 timestamper
 warnings-ng
 workflow-aggregator
