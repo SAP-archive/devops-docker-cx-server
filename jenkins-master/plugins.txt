@@ -43,7 +43,7 @@ saferestart
 sonar
 ssh-agent
 timestamper
-warnings-ng:8.3.0
+warnings-ng
 workflow-aggregator
 workflow-basic-steps
 workflow-cps
