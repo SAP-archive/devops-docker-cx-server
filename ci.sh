@@ -44,12 +44,14 @@ push_image() {
     local TAG=$1
 
     docker tag "${TAG}":"${VERSION}"-RC "${TAG}":"${VERSION}"
+    docker tag "${TAG}":"${VERSION}"-RC "ghcr.io/SAP/${TAG}":"${VERSION}"
 
     if [ "${VERSION}" = latest ]; then
         docker push "${TAG}":backup-of-latest
     fi
 
     docker push "${TAG}":"${VERSION}"
+    docker push "ghcr.io/SAP/${TAG}":"${VERSION}"
 }
 
 echo '::group::Pull Base Images'
