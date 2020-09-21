@@ -17,6 +17,9 @@ fi
 build_image() {
     local TAG=$1
     local DIR=$2
+    # Replace slash with dash for GitHub because "sap" is already the org and "ppiper" is a part of the name
+    local GH_TAG=$(echo $TAG | sed -e 's/\//-/g') #fixme just testing
+
 
     if [ "${VERSION}" = latest ]; then
         # Create a backup of the image to allow rollback in case of failure
@@ -26,6 +29,7 @@ build_image() {
 
     # Build the Release Candidate
     docker build "${DIR}" --tag "${TAG}":"${VERSION}"-RC
+    docker tag "${TAG}":"${VERSION}"-RC "ghcr.io/sap/${GH_TAG}":"${VERSION}" #fixme just testing
 }
 
 smoke_test() {
@@ -42,16 +46,18 @@ smoke_test() {
 
 push_image() {
     local TAG=$1
+    # Replace slash with dash for GitHub because "sap" is already the org and "ppiper" is a part of the name
+    local GH_TAG=$(echo $TAG | sed -e 's/\//-/g')
 
     docker tag "${TAG}":"${VERSION}"-RC "${TAG}":"${VERSION}"
-    docker tag "${TAG}":"${VERSION}"-RC "ghcr.io/sap/${TAG}":"${VERSION}"
+    docker tag "${TAG}":"${VERSION}"-RC "ghcr.io/sap/${GH_TAG}":"${VERSION}"
 
     if [ "${VERSION}" = latest ]; then
         docker push "${TAG}":backup-of-latest
     fi
 
     docker push "${TAG}":"${VERSION}"
-    docker push "ghcr.io/sap/${TAG}":"${VERSION}"
+    docker push "ghcr.io/sap/${GH_TAG}":"${VERSION}"
 }
 
 echo '::group::Pull Base Images'
