@@ -15,7 +15,8 @@ RUN apt-get update && \
         ca-certificates \
         curl \
         gnupg2 \
-        software-properties-common && \
+        software-properties-common \
+        maven && \
     curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
     apt-key fingerprint 0EBFCD88 && \
     add-apt-repository \
@@ -25,7 +26,7 @@ RUN apt-get update && \
     apt-get update && \
     apt-get -y --no-install-recommends install docker-ce && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/*  && \
-    /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt && \ 
+    /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt && \
     chown -R jenkins /usr/share/jenkins/ref && \
     echo 2.0 > /usr/share/jenkins/ref/jenkins.install.UpgradeWizard.state
 

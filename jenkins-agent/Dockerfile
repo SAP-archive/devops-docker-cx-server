@@ -13,7 +13,8 @@ RUN apt-get update && \
         ca-certificates \
         curl \
         gnupg2 \
-        software-properties-common && \
+        software-properties-common \
+        maven && \
     curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
     apt-key fingerprint 0EBFCD88 && \
     add-apt-repository \
