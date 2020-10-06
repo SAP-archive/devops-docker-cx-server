@@ -16,7 +16,8 @@ RUN apt-get update && \
         curl \
         gnupg2 \
         software-properties-common \
-        maven && \
+        maven \
+        openjdk-11-jdk-headless && \
     curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
     apt-key fingerprint 0EBFCD88 && \
     add-apt-repository \
