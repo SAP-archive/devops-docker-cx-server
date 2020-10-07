@@ -23,7 +23,7 @@ RUN apt-get update && \
        stable" && \
     apt-get update && \
     apt-get -y --no-install-recommends install docker-ce && \
-    rm -rf /var/lib/apt/lists/* /var/cache/apt/* \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/* && \
     mkdir -p /usr/share/maven && pushd /usr/share/maven && \
     curl https://apache.lauf-forum.at/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz | tar xz --strip-components=1 && \
     popd && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
