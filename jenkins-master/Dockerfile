@@ -1,6 +1,6 @@
 FROM jenkins/jenkins:lts-slim
 
-ENV MAVEN_VERSION=3.6.3
+ENV MAVEN_VERSION 3.6.3
 
 USER root
 
