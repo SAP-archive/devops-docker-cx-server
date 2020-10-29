@@ -23,7 +23,7 @@ jobs:
             echo "Planned next release version ($NEXT_VERSION) already exists, aborting process"
             exit 1
           fi
-          echo "::set-env name=PIPER_version::$NEXT_VERSION"
+          echo "PIPER_version=$NEXT_VERSION" >> $GITHUB_ENV
 
       - name: Build, test and push
         run: |
