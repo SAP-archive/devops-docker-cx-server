@@ -1,0 +1,14 @@
+name: Infrastructure Tests
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run a multi-line script
+      working-directory: infrastructure-tests
+      run: |
+        chmod +x runTests.sh
+        ./runTests.sh

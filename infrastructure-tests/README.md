@@ -10,7 +10,7 @@ This directory contains testing code for the infrastructure that is defined in t
 
 ## Running as a Service
 
-See `.travis.yml` file for configuration.
+See `.github/workflows/tests.yml` file for configuration.
 
 ## Running locally
 
