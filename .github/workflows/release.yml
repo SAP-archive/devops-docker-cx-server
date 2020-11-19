@@ -3,8 +3,6 @@ name: Create new weekly Release (automated)
 on:
   repository_dispatch:
     types: perform-release
-  schedule:
-    - cron:  '0 9 * * 1'
 
 jobs:
   create-release:

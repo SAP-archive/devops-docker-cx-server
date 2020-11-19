@@ -1,11 +1,9 @@
-name: Build images and push (on master branch or on schedule)
+name: Build images and push
 
 on:
   push:
     branches:
       - "**"
-  schedule:
-    - cron:  '0 6 * * 1-4'
 
 jobs:
   push:
