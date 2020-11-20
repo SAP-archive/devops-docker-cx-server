@@ -2,7 +2,7 @@
 # hadolint ignore=DL3006
 FROM ppiper/jenkins-master
 
-ENV JENKINSFILE_RUNNER_VERSION 1.0-beta-12
+ENV JENKINSFILE_RUNNER_VERSION 1.0-beta-19
 
 # User needs to be root for access to mounted Docker socket
 # hadolint ignore=DL3002
