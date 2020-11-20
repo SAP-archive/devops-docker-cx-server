@@ -2,6 +2,7 @@
 unclassified:
   globallibraries:
     libraries:
+      #fixme check if this lib is still needed?
     - defaultVersion: "master"
       name: "s4sdk-pipeline-library"
       retriever:
