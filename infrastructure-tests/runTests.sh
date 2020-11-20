@@ -75,7 +75,7 @@ JENKINS_USERNAME=admin JENKINS_PASSWORD=$ADMIN_PASSWORD ./cx-server stop
 ./cx-server remove
 
 # cleanup
-if [ ! "$TRAVIS" = true ] ; then
+if [ ! "$GITHUB_ACTIONS" = true ] ; then
     rm -f cx-server server.cfg custom-environment.list
     echo "Modified your git repo, you might want to do a git checkout before re-running."
 fi
