@@ -2,14 +2,6 @@
 unclassified:
   globallibraries:
     libraries:
-      #fixme check if this lib is still needed?
-    - defaultVersion: "master"
-      name: "s4sdk-pipeline-library"
-      retriever:
-        modernSCM:
-          scm:
-            git:
-              remote: "https://github.com/SAP/cloud-s4-sdk-pipeline-lib.git"
     - defaultVersion: "master"
       name: "jenkins-library-test"
       retriever:
