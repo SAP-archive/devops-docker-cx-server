@@ -7,7 +7,7 @@ jobs:
               git {
                   id('validation-job')
                   remote("https://github.com/piper-validation/cloud-s4-sdk-book")
-                  includes('validate-cx-server')
+                  includes('validate-cx-server-gpp')
               }
           }
       }
