@@ -1,4 +1,3 @@
-analysis-collector
 ansicolor
 authorize-project
 badge
@@ -14,7 +13,6 @@ credentials-binding
 cucumber-testresult-plugin
 docker-workflow
 email-ext
-findbugs
 gatling
 ghprb
 github-branch-source
@@ -36,7 +34,6 @@ pipeline-input-step
 pipeline-milestone-step
 pipeline-stage-step
 pipeline-utility-steps
-pmd
 rebuild
 role-strategy
 saferestart
