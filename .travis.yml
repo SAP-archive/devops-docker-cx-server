@@ -1,4 +1,0 @@
-language: minimal
-services:
-- docker
-script: cd infrastructure-tests && chmod +x runTests.sh && ./runTests.sh

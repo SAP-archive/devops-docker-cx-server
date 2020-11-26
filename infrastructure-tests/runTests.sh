@@ -1,20 +1,6 @@
 #!/bin/bash -ex
 
-# Update docker to avoid api-version issues due to outdated version
-sudo apt-get -yq update
-sudo apt-get -yq install \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg-agent \
-    software-properties-common
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-   $(lsb_release -cs) \
-   stable"
-sudo apt-get -yq update
-sudo apt-get -y install docker-ce docker-ce-cli containerd.io
+# Output docker version in case any api incompatibilies come up
 docker version
 
 # Start a local registry, to which we push the images built in this test, and from which they will be consumed in the test
@@ -75,7 +61,7 @@ JENKINS_USERNAME=admin JENKINS_PASSWORD=$ADMIN_PASSWORD ./cx-server stop
 ./cx-server remove
 
 # cleanup
-if [ ! "$TRAVIS" = true ] ; then
+if [ ! "$GITHUB_ACTIONS" = true ] ; then
     rm -f cx-server server.cfg custom-environment.list
     echo "Modified your git repo, you might want to do a git checkout before re-running."
 fi

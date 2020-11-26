@@ -23,10 +23,11 @@ jobs:
             echo "Planned next release version ($NEXT_VERSION) already exists, aborting process"
             exit 1
           fi
-          echo "::set-env name=PIPER_version::$NEXT_VERSION"
+          echo "PIPER_version=$NEXT_VERSION" >> $GITHUB_ENV
 
       - name: Build, test and push
         run: |
+          echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u ${{ secrets.CR_USER }} --password-stdin
           echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
           ./ci.sh ${PIPER_version}
 

@@ -52,7 +52,7 @@ You can consume these images in three different flavors:
 1. Build locally and run
 
     Clone this repository, change directories to the desired Dockerfile and build it:
-    
+
     ````
     git clone https://github.com/SAP/devops-docker-cx-server
     cd devops-docker-cx-server/<specific-image>
@@ -65,7 +65,7 @@ You can consume these images in three different flavors:
 2. Pull from hub.docker.com
 
     We build the Dockerfiles for your convenience and store them on https://hub.docker.com/.
-    
+
     ````
     docker pull <image-name>:<version>
     docker run ...
@@ -73,18 +73,18 @@ You can consume these images in three different flavors:
 
 3. Via project "Piper"
 
-    In case you are using [project "Piper"](https://sap.github.io/jenkins-library/) you can configure certain steps 
-    to use docker images instead of the local Jenkins environment. These steps will automatically pull and run these 
+    In case you are using [project "Piper"](https://sap.github.io/jenkins-library/) you can configure certain steps
+    to use docker images instead of the local Jenkins environment. These steps will automatically pull and run these
     images.
- 
+
 ### Setting up Jenkins Server
 The `cx-server` is a toolkit that is developed to manage the lifecycle of the Jenkins server.
-In order to use the toolkit, you need a file named `cx-server` and a configuration file `server.cfg`. 
+In order to use the toolkit, you need a file named `cx-server` and a configuration file `server.cfg`.
 You can generate these files using the docker command
 
 ```sh
 docker run -it --rm -u $(id -u):$(id -g) -v "${PWD}":/cx-server/mount/ ppiper/cx-server-companion:latest init-cx-server
-``` 
+```
 
 Once the files are generated in the current directory, you can launch the below command to start the Jenkins server.
 
@@ -92,7 +92,7 @@ Once the files are generated in the current directory, you can launch the below 
 ./cx-server start
 ```
 
-If you would like to customize the Jenkins, [the operations guide](https://github.com/SAP/devops-docker-cx-server/blob/master/docs/operations/cx-server-operations-guide.md) will provide more information on this along with the lifecycle management of the Jenkins. 
+If you would like to customize the Jenkins, [the operations guide](https://github.com/SAP/devops-docker-cx-server/blob/master/docs/operations/cx-server-operations-guide.md) will provide more information on this along with the lifecycle management of the Jenkins.
 
 ## How to obtain support
 
@@ -104,14 +104,5 @@ the [GitHub issues page of this project][devops-docker-cx-server-issues].
 Read and understand our [contribution guidelines][contribution]
 before opening a pull request.
 
-## License
-
-Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
-This file is licensed under the Apache Software License, v. 2 except as noted
-otherwise in the [LICENSE file][license].
-
-Please note that Docker images can contain other software which may be licensed under different licenses. This License file is also included in the Docker image. For any usage of built Docker images please make sure to check the licenses of the artifacts contained in the images.
-
 [devops-docker-cx-server-issues]: https://github.com/SAP/devops-docker-cx-server/issues
-[license]: https://github.com/SAP/devops-docker-cx-server/blob/master/LICENSE
 [contribution]: https://github.com/SAP/devops-docker-cx-server/blob/master/CONTRIBUTING.md

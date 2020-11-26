@@ -42,14 +42,18 @@ smoke_test() {
 
 push_image() {
     local TAG=$1
+    # Replace slash with dash for GitHub because "sap" is already the org and "ppiper" is a part of the name
+    local GH_TAG=$(echo $TAG | sed -e 's/\//-/g')
 
     docker tag "${TAG}":"${VERSION}"-RC "${TAG}":"${VERSION}"
+    docker tag "${TAG}":"${VERSION}"-RC "ghcr.io/sap/${GH_TAG}":"${VERSION}"
 
     if [ "${VERSION}" = latest ]; then
         docker push "${TAG}":backup-of-latest
     fi
 
     docker push "${TAG}":"${VERSION}"
+    docker push "ghcr.io/sap/${GH_TAG}":"${VERSION}"
 }
 
 echo '::group::Pull Base Images'
