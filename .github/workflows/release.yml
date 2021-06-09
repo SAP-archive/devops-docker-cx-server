@@ -13,19 +13,26 @@ jobs:
       - uses: actions/checkout@v1
       - name: Prepare Release
         run: |
-          CURRENT_VERSION_LONG=$(curl --silent "https://api.github.com/repos/SAP/devops-docker-cx-server/releases/latest" | jq -r .tag_name)
+          CURRENT_VERSION_LONG=$(curl --silent "https://api.github.com/repos/SAP/devops-docker-cx-server/releases" | jq -r '.[].tag_name' | head -n1)
           echo Current version: $CURRENT_VERSION_LONG
           CURRENT_VERSION=`echo $CURRENT_VERSION_LONG | cut -c 2- | cut -d. -f1`
-          NEXT_VERSION=$(expr $CURRENT_VERSION + 1)
-          echo Next version: v$NEXT_VERSION
-          echo "::set-env name=PIPER_version::v$NEXT_VERSION"
+          NEXT_VERSION=v$(expr $CURRENT_VERSION + 1)
+          echo Next version: $NEXT_VERSION
+          STATUS_CODE_FOR_NEXT_RELEASE=$(curl -s -o /dev/null -w "%{http_code}" "https://api.github.com/repos/SAP/devops-docker-cx-server/releases/tags/$NEXT_VERSION")
+          if [ "$STATUS_CODE_FOR_NEXT_RELEASE" != "404" ]; then
+            echo "Planned next release version ($NEXT_VERSION) already exists, aborting process"
+            exit 1
+          fi
+          echo "PIPER_version=$NEXT_VERSION" >> $GITHUB_ENV
+
+      - name: Build, test and push
+        run: |
+          echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u ${{ secrets.CR_USER }} --password-stdin
+          echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
+          ./ci.sh ${PIPER_version}
+
       - uses: SAP/project-piper-action@master
         with:
           piper-version: latest
           command: githubPublishRelease
           flags: --token ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build, test and push
-        run: |
-          echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
-          ./ci.sh ${PIPER_version}

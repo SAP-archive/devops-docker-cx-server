@@ -244,7 +244,7 @@ function get_proxy_parameters()
 function wait_for_started()
 {
     echo -n "Waiting for the Cx server to start"
-    wait_for_successful_start 120 "${jenkins_container_name}" curl --noproxy localhost --silent "http://localhost:${container_port_http}/api/json"
+    wait_for_successful_start 180 "${jenkins_container_name}" curl --noproxy localhost --silent "http://localhost:${container_port_http}/api/json"
 }
 
 function stop_jenkins()
@@ -260,14 +260,19 @@ function stop_jenkins()
 
 function stop_jenkins_container()
 {
-    echo -n "Jenkins username (leave empty for unprotected server): "
-    read -r user_name
-
     user_and_pass=()
-    if [ ! -z "${user_name}" ]; then
-        echo -n "Password for ${user_name}: "
-        read -r -s password
-        user_and_pass=(-u "${user_name}:${password}")
+
+    if [[ -n "${JENKINS_USERNAME}" && -n "${JENKINS_PASSWORD}" ]]; then
+        user_and_pass=(-u "${JENKINS_USERNAME}:${JENKINS_PASSWORD}")
+    else
+        echo -n "Jenkins username (leave empty for unprotected server): "
+        read -r user_name
+
+        if [ ! -z "${user_name}" ]; then
+            echo -n "Password for ${user_name}: "
+            read -r -s password
+            user_and_pass=(-u "${user_name}:${password}")
+        fi
     fi
 
     if [ ! -e "${tmp_dir}" ]; then
@@ -302,7 +307,7 @@ function stop_jenkins_container()
     fi
 
     echo -n "Waiting for Cx server to accept safeExit signal..."
-    local attempts=120
+    local attempts=180
     local i
     for ((i=0; i < attempts; i++)); do
         echo -n "."
@@ -488,7 +493,7 @@ function start_nexus_container()
 function wait_for_nexus_started()
 {
     echo -n "Waiting for the nexus server to start"
-    wait_for_successful_start 120 "${nexus_container_name}" curl --noproxy localhost --silent -X GET http://localhost:8081/service/rest/v1/script --header 'Authorization: Basic YWRtaW46YWRtaW4xMjM=' --header 'Content-Type: application/json'
+    wait_for_successful_start 180 "${nexus_container_name}" curl --noproxy localhost --silent -X GET http://localhost:8081/service/rest/v1/script --header 'Authorization: Basic YWRtaW46YWRtaW4xMjM=' --header 'Content-Type: application/json'
 }
 
 function init_nexus()

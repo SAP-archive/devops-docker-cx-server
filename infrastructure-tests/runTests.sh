@@ -1,5 +1,8 @@
 #!/bin/bash -ex
 
+# Output docker version in case any api incompatibilies come up
+docker version
+
 # Start a local registry, to which we push the images built in this test, and from which they will be consumed in the test
 docker run -d -p 5000:5000 --restart always --name registry registry:2 || true
 find ../cx-server-companion -type f -exec sed -i -e 's/ppiper/localhost:5000\/ppiper/g' {} \;
@@ -54,8 +57,11 @@ if [ "$ACTUAL_STATUS_CODE_WITH_AUTH" != "400" ]; then
     exit 123
 fi
 
+JENKINS_USERNAME=admin JENKINS_PASSWORD=$ADMIN_PASSWORD ./cx-server stop
+./cx-server remove
+
 # cleanup
-if [ ! "$TRAVIS" = true ] ; then
+if [ ! "$GITHUB_ACTIONS" = true ] ; then
     rm -f cx-server server.cfg custom-environment.list
     echo "Modified your git repo, you might want to do a git checkout before re-running."
 fi
