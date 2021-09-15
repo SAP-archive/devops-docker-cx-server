@@ -1,3 +1,7 @@
+# CX Server Dockerfiles
+
+[![REUSE status](https://api.reuse.software/badge/github.com/SAP/devops-docker-cx-server)](https://api.reuse.software/info/github.com/SAP/devops-docker-cx-server)
+
 ## Description
 
 The CX Server is a collection of [_Dockerfiles_](https://docs.docker.com/engine/reference/builder/) for images that can be used in _Continuous Delivery_ (CD) pipelines for SAP development projects.
@@ -106,3 +110,7 @@ before opening a pull request.
 
 [devops-docker-cx-server-issues]: https://github.com/SAP/devops-docker-cx-server/issues
 [contribution]: https://github.com/SAP/devops-docker-cx-server/blob/master/CONTRIBUTING.md
+
+## Licensing
+
+Copyright 2017-2021 SAP SE or an SAP affiliate company and devops-docker-cx-server contributors. Please see our [LICENSE](LICENSE) for copyright and license information. Detailed information including third-party components and their licensing/copyright information is available [via the REUSE tool](https://api.reuse.software/info/github.com/SAP/devops-docker-cx-server).
