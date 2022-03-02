@@ -3,7 +3,7 @@
 Jenkins master image for use with project ["Piper"](https://github.com/SAP/jenkins-library).
 
 This image is intended to be used with the Cx Server life-cycle management.
-Please refer to the [Operations Guide for Cx Server](https://github.com/SAP/devops-docker-images/blob/master/docs/operations/cx-server-operations-guide.md) for detailed usage.
+Please refer to the [Operations Guide for Cx Server](../docs/operations/cx-server-operations-guide.md) for detailed usage.
 
 ## Download
 
