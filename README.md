@@ -2,6 +2,12 @@
 
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP/devops-docker-cx-server)](https://api.reuse.software/info/github.com/SAP/devops-docker-cx-server)
 
+## Deprecation Note
+devops-docker-cx-server is deprecated and won't be developed or maintained further. The repository will be sunsetted soon.
+If somebody outside in the community would like to take over this repository, feel free to contact us.
+
+A manual, how to setup your Jenkins manually, can be found here: [Jenkins Setup](https://www.project-piper.io/infrastructure/customjenkins/)
+
 ## Description
 
 The CX Server is a collection of [_Dockerfiles_](https://docs.docker.com/engine/reference/builder/) for images that can be used in _Continuous Delivery_ (CD) pipelines for SAP development projects.
