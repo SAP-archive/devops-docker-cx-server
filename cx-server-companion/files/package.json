@@ -6,6 +6,6 @@
   "dependencies": {
     "escape-string-regexp": "^1.0.5",
     "request": "^2.87.0",
-    "underscore": "^1.9.1"
+    "underscore": "^1.12.1"
   }
 }
