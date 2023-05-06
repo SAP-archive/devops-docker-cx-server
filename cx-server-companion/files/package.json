@@ -5,7 +5,7 @@
   "repository": "https://github.com/SAP/devops-docker-images",
   "dependencies": {
     "escape-string-regexp": "^1.0.5",
-    "request": "^2.87.0",
+    "request": "^2.88.2",
     "underscore": "^1.9.1"
   }
 }
