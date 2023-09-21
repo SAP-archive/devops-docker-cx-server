@@ -1,6 +1,6 @@
 FROM jenkins/jenkins:lts-slim
 
-ENV MAVEN_VERSION 3.6.3
+ENV MAVEN_VERSION 3.9.4
 
 USER root
 
@@ -27,11 +27,11 @@ RUN apt-get update && \
     apt-get update && \
     apt-get -y --no-install-recommends install docker-ce && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/*  && \
-    /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt && \
+    jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt && \
     chown -R jenkins /usr/share/jenkins/ref && \
     echo 2.0 > /usr/share/jenkins/ref/jenkins.install.UpgradeWizard.state && \
     mkdir -p /usr/share/maven && pushd /usr/share/maven && \
-    curl https://apache.lauf-forum.at/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz | tar xz --strip-components=1 && \
+    curl https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz | tar xz --strip-components=1 && \
     popd && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
 
 USER jenkins
